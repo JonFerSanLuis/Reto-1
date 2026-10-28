@@ -1,7 +1,7 @@
 {
   "fuente": "OpenDataEuskadi_Visesa",
   "total_registros": 10,
-  "fecha_ejecucion": "2026-10-28T17:03:27.416936+00:00",
+  "fecha_ejecucion": "2026-10-28T17:14:22.278526+00:00",
   "items": [
     {
       "id": "visesa_9807",
@@ -18,7 +18,7 @@
       "titulo": "Agurain 58 (boe-a)",
       "descripcion": "56 babes ofizialeko etxebizitzak alokairuan.",
       "url": "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9807",
-      "fecha_extraccion": "2026-10-28T17:03:27.416287+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.277508+00:00",
       "es_sintetico": false
     },
     {
@@ -36,7 +36,7 @@
       "titulo": "Zorrotzaurre 113 (boe-a)",
       "descripcion": "113 babes ofizialeko etxebizitzak alokairuan.",
       "url": "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9799",
-      "fecha_extraccion": "2026-10-28T17:03:27.416287+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.277508+00:00",
       "es_sintetico": false
     },
     {
@@ -54,7 +54,7 @@
       "titulo": "Salburua 162 (boe-a)",
       "descripcion": "162 babes ofizialeko etxebizitzak alokairuan.",
       "url": "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9800",
-      "fecha_extraccion": "2026-10-28T17:03:27.416287+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.277508+00:00",
       "es_sintetico": false
     },
     {
@@ -72,7 +72,7 @@
       "titulo": "Abanto-Zierbena 40 (boe-a)",
       "descripcion": "40 babes ofizialeko etxebizitzak alokairuan.",
       "url": "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9806",
-      "fecha_extraccion": "2026-10-28T17:03:27.416287+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.277508+00:00",
       "es_sintetico": false
     },
     {
@@ -90,7 +90,7 @@
       "titulo": "Bolueta 175 (boe-a)",
       "descripcion": "175 babes ofizialeko etxebizitzak alokairuan.",
       "url": "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9788",
-      "fecha_extraccion": "2026-10-28T17:03:27.416287+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.277508+00:00",
       "es_sintetico": false
     },
     {
@@ -108,7 +108,7 @@
       "titulo": "Zorrotzaurre 66 (boe-a)",
       "descripcion": "66 babes ofizialeko etxebizitzak alokairuan.",
       "url": "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9789",
-      "fecha_extraccion": "2026-10-28T17:03:27.416287+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.277508+00:00",
       "es_sintetico": false
     },
     {
@@ -126,7 +126,7 @@
       "titulo": "Irun 206 (boe-a)",
       "descripcion": "206 babes ofizialeko etxebizitzak alokairuan.",
       "url": "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9836",
-      "fecha_extraccion": "2026-10-28T17:03:27.416287+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.277508+00:00",
       "es_sintetico": false
     },
     {
@@ -144,7 +144,7 @@
       "titulo": "Laudio 64 (boe-a)",
       "descripcion": "64 babes ofizialeko etxebizitzak alokairuan.",
       "url": "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9798",
-      "fecha_extraccion": "2026-10-28T17:03:27.416287+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.277508+00:00",
       "es_sintetico": false
     },
     {
@@ -162,7 +162,7 @@
       "titulo": "Salburua 225 (boe-a)",
       "descripcion": "225 babes ofizialeko etxebizitzak alokairuan.",
       "url": "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9797",
-      "fecha_extraccion": "2026-10-28T17:03:27.416287+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.277508+00:00",
       "es_sintetico": false
     },
     {
@@ -180,7 +180,7 @@
       "titulo": "Otxarkoaga 60 (boe-a)",
       "descripcion": "60 babes ofizialeko etxebizitzak alokairuan.",
       "url": "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9784",
-      "fecha_extraccion": "2026-10-28T17:03:27.416287+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.277508+00:00",
       "es_sintetico": false
     }
   ],

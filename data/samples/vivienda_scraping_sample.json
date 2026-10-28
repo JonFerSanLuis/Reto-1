@@ -1,7 +1,7 @@
 {
   "fuente": "Habitaclia_Scraping",
   "total_registros": 10,
-  "fecha_ejecucion": "2026-10-28T17:03:29.262355+00:00",
+  "fecha_ejecucion": "2026-10-28T17:14:23.977245+00:00",
   "items": [
     {
       "id": "habitaclia_art_0",
@@ -18,7 +18,7 @@
       "titulo": "Ático con ascensor en alquiler en Buenos Aires Kalea",
       "descripcion": "Abando - Albia, Bilbao",
       "url": "https://www.habitaclia.com/alquiler/atico/buenos-aires-kalea/abando-albia/bilbao/751304ef-f160-4b44-89b0-a1f639282bb0/d",
-      "fecha_extraccion": "2026-10-28T17:03:28.252392+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.966926+00:00",
       "es_sintetico": false
     },
     {
@@ -36,7 +36,7 @@
       "titulo": "Piso con ascensor en alquiler en Begoña - Santutxu",
       "descripcion": "Bilbao, Bizkaia",
       "url": "https://www.habitaclia.com/inmobiliaria/inmobiliaria-estudio/",
-      "fecha_extraccion": "2026-10-28T17:03:28.252392+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.967928+00:00",
       "es_sintetico": false
     },
     {
@@ -54,7 +54,7 @@
       "titulo": "Piso con balcón en alquiler en Basurtu Kastrexana Errepidea",
       "descripcion": "Basurtu - Zorrotza, Bilbao",
       "url": "https://www.habitaclia.com/inmobiliaria/inmobiliaria-campuzano/",
-      "fecha_extraccion": "2026-10-28T17:03:28.253428+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.967928+00:00",
       "es_sintetico": false
     },
     {
@@ -72,7 +72,7 @@
       "titulo": "Piso con ascensor en alquiler en Calle Marcelino Oreja",
       "descripcion": "Indautxu, Bilbao",
       "url": "https://www.habitaclia.com/inmobiliaria/bertegi-gestores-inmobiliarios/",
-      "fecha_extraccion": "2026-10-28T17:03:28.254417+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.968927+00:00",
       "es_sintetico": false
     },
     {
@@ -90,7 +90,7 @@
       "titulo": "Piso con ascensor en alquiler en Baztan Haranaren Plaza",
       "descripcion": "Deusto, Bilbao",
       "url": "https://www.habitaclia.com/inmobiliaria/inmobiliaria-avenida-155/",
-      "fecha_extraccion": "2026-10-28T17:03:28.254417+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.969910+00:00",
       "es_sintetico": false
     },
     {
@@ -108,7 +108,7 @@
       "titulo": "Piso con ascensor en alquiler en Urkixo Zumarkalea",
       "descripcion": "Indautxu, Bilbao",
       "url": "https://www.habitaclia.com/inmobiliaria/inmobiliaria-campuzano/",
-      "fecha_extraccion": "2026-10-28T17:03:28.255445+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.969910+00:00",
       "es_sintetico": false
     },
     {
@@ -126,7 +126,7 @@
       "titulo": "Piso con balcón en alquiler en Deustuibarra 19",
       "descripcion": "Deusto, Bilbao",
       "url": "https://www.habitaclia.com/alquiler/planta-intermedia/deustuibarra-19/deusto/bilbao/70aaf6fc-d935-453a-917f-2a91c7fd43ef/d",
-      "fecha_extraccion": "2026-10-28T17:03:28.256443+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.970909+00:00",
       "es_sintetico": false
     },
     {
@@ -144,7 +144,7 @@
       "titulo": "Piso con ascensor en alquiler en Autonomia Kalea 4",
       "descripcion": "Abando - Albia, Bilbao",
       "url": "https://www.habitaclia.com/alquiler/planta-intermedia/autonomia-kalea-4/abando-albia/bilbao/c2844f5c-8f92-4bbd-bbae-175f8bd7ec72/d",
-      "fecha_extraccion": "2026-10-28T17:03:28.256443+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.971923+00:00",
       "es_sintetico": false
     },
     {
@@ -162,7 +162,7 @@
       "titulo": "Apartamento en alquiler en Avenida del Ferrocarril",
       "descripcion": "Errekalde, Bilbao",
       "url": "https://www.habitaclia.com/alquiler/apartamento/avenida-del-ferrocarril/errekalde/bilbao/57904c04-17c0-489e-a84e-93b0aade1c63/d",
-      "fecha_extraccion": "2026-10-28T17:03:28.257444+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.971923+00:00",
       "es_sintetico": false
     },
     {
@@ -180,7 +180,7 @@
       "titulo": "Piso con ascensor en alquiler en Pablo de Alzola Kalea 4",
       "descripcion": "Basurtu - Zorrotza, Bilbao",
       "url": "https://www.habitaclia.com/alquiler/planta-intermedia/pablo-de-alzola-kalea-4/basurtu-zorrotza/bilbao/2f1a4f4d-86f4-46f7-afb1-70a7f07fbc61/d",
-      "fecha_extraccion": "2026-10-28T17:03:28.258443+00:00",
+      "fecha_extraccion": "2026-10-28T17:14:22.972909+00:00",
       "es_sintetico": false
     }
   ],
