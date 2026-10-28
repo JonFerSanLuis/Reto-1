@@ -4,8 +4,8 @@ Proyecto académico de Ingeniería de Datos e Inteligencia Artificial enfocado e
 
 Este repositorio implementa la infraestructura completa correspondiente a los **cuatro primeros objetivos del reto**:
 
-1. **Extracción de datos de vivienda**: Recopilación automatizada mediante API oficial (Open Data Euskadi / Visesa) y Web Scraping ético (Habitaclia).
-2. **Indicadores complementarios**: Descarga de estadísticas demográficas y salariales de Eustat / Udalmap (población, renta disponible, desempleo juvenil, solicitudes de VPO).
+1. **Extracción de datos de vivienda**: Recopilación automatizada mediante API oficial (Open Data Euskadi / Visesa) y Web Scraping ético (Habitaclia y Pisos.com).
+2. **Indicadores complementarios**: Descarga de estadísticas demográficas y salariales de Eustat / Udalmap (población, renta disponible, desempleo juvenil, solicitudes de VPO) e indicadores del **Observatorio Vasco de la Juventud (OVJ)** con cálculo de tasa de esfuerzo juvenil y programa Gaztelagun.
 3. **Almacenamiento de originales en HDFS**: Almacenamiento organizado y verificado en Apache Hadoop HDFS con preservación de checksums SHA-256 y capacidad de recuperación.
 4. **Streaming y simulación con Apache Kafka**: Publicación de anuncios en tiempo real mediante productor y consumidor en Python sobre el tópico `euskadi-anuncios-inmobiliarios`.
 
@@ -17,14 +17,14 @@ Este repositorio implementa la infraestructura completa correspondiente a los **
 flowchart TD
     subgraph S1["1. Fuentes de Datos Reales (Euskadi)"]
         A1["Open Data Euskadi / Visesa (API REST)"]
-        A2["Portal Inmobiliario Habitaclia (Web Scraping)"]
-        A3["Eustat / Udalmap (API REST Indicadores)"]
+        A2["Portales Habitaclia y Pisos.com (Web Scraping)"]
+        A3["Eustat / Udalmap / OVJ (Indicadores y Juventud)"]
     end
 
     subgraph S2["2. Ingesta y Estandarización Local"]
         B1["src/extraction/api_client.py"]
-        B2["src/extraction/scraper.py"]
-        B3["src/indicators/udalmap_client.py"]
+        B2["src/extraction/scraper.py + pisos_scraper.py"]
+        B3["src/indicators/udalmap_client.py + ovj_client.py"]
         RAW["data/raw/ (JSON / CSV Originales)"]
     end
 
@@ -78,10 +78,12 @@ flowchart TD
 │   ├── extraction/                 # Objetivo 1: Extracción de vivienda
 │   │   ├── models.py               # Modelos Pydantic (HousingAd, ExtractionResult)
 │   │   ├── api_client.py           # Cliente API Open Data Euskadi / Visesa
-│   │   └── scraper.py              # Web scraper ético con BeautifulSoup
-│   ├── indicators/                 # Objetivo 2: Indicadores socioeconómicos
+│   │   ├── scraper.py              # Web scraper ético Habitaclia
+│   │   └── pisos_scraper.py        # Web scraper ético Pisos.com (Araba, Bizkaia, Gipuzkoa)
+│   ├── indicators/                 # Objetivo 2: Indicadores socioeconómicos y de juventud
 │   │   ├── models.py               # Modelos de indicadores municipales y metadatos
-│   │   └── udalmap_client.py       # Cliente API REST Udalmap (Eustat)
+│   │   ├── udalmap_client.py       # Cliente API REST Udalmap (Eustat)
+│   │   └── ovj_client.py           # Cliente Observatorio Vasco de la Juventud (esfuerzo, salario y Gaztelagun)
 │   ├── hdfs/                       # Objetivo 3: Almacenamiento en HDFS
 │   │   └── client.py               # Cliente WebHDFS con verificación SHA-256
 │   └── kafka/                      # Objetivo 4: Streaming con Apache Kafka
@@ -110,10 +112,12 @@ flowchart TD
 - **Campos**: `idContenido`, `codigoInterno`, `poblacion`, `precioMinimo`, `rentaMinima`, `superficie`, `numeroDormitorios`, `estado`, `fechaPrevista`.
 - **Limitaciones**: Representa promociones y parque protegido, no el total del mercado libre privado.
 
-### 2. Anuncios de Mercado Libre (Web Scraping Habitaclia)
-- **Fuente**: Habitaclia (alquiler y compraventa en capitales y municipios vascos).
-- **Cumplimiento**: Respeta `robots.txt` (las fichas de búsqueda residencial no están restringidas; no accede a endpoints privados/ajax), pausas de 1.5s entre peticiones y cabecera User-Agent identificada.
-- **Campos**: `id`, `municipio`, `barrio`, `precio` (€ o €/mes), `superficie_m2`, `habitaciones`, `banos`, `titulo`, `url`.
+### 2. Anuncios de Mercado Libre (Web Scraping Habitaclia y Pisos.com)
+- **Fuentes**: 
+  - **Habitaclia**: Alquiler y compraventa en capitales y municipios vascos.
+  - **Pisos.com**: Cobertura ampliada en los 3 territorios históricos (Bizkaia, Gipuzkoa y Araba).
+- **Cumplimiento**: Respeta `robots.txt` (las fichas de búsqueda residencial no están restringidas; no accede a endpoints privados/ajax), pausas de 1.0-1.5s entre peticiones y cabeceras User-Agent identificadas.
+- **Campos**: `id`, `municipio`, `provincia`, `barrio`, `precio` (€ o €/mes), `superficie_m2`, `habitaciones`, `banos`, `titulo`, `url`.
 - **Limitaciones**: Datos volátiles sujetos a la oferta comercial disponible en el momento del rastreo.
 
 ### 3. Indicadores Socioeconómicos (Udalmap / Eustat)
@@ -125,7 +129,15 @@ flowchart TD
   - `ID 61`: Renta personal disponible media (€/año). Renta neta para cálculo de tasa de esfuerzo.
   - `ID 50`: Tasa de ocupación juvenil (16-24 años) (%). Población joven empleada sobre total joven.
   - `ID 86`: Solicitudes de vivienda en Etxebide (‰ habitantes). Demanda administrativa de vivienda protegida.
-- **Limitaciones**: Las estadísticas fiscales de renta presentan un desfase de publicación habitual de 1-2 años respecto al censo en tiempo real.
+
+### 4. Indicadores de Juventud y Esfuerzo Residencial (Observatorio Vasco de la Juventud)
+- **Fuente**: Gazteen Euskal Behatokia / Eustat / Departamento de Igualdad, Justicia y Políticas Sociales.
+- **Indicadores Clave**:
+  - `OVJ_EMAN_18_29`: Tasa de emancipación residencial de la juventud de 18 a 29 años en Euskadi (33.4%).
+  - `OVJ_EMAN_30_34`: Tasa de emancipación de adultos jóvenes de 30 a 34 años (73.2%).
+  - `OVJ_COSTE_ALQUILER_SOLO`: Coste de acceso al alquiler libre en solitario (% de salario neto necesario: >61%).
+  - `OVJ_COSTE_HIPOTECA_SOLO`: Coste de acceso a la compraventa libre en solitario (% de salario neto necesario: >68%).
+  - **Programa Gaztelagun**: Cuantificación de la ayuda mensual al alquiler para menores de 36 años (hasta 300 €/mes o 50% de la renta).
 
 ---
 
@@ -147,13 +159,10 @@ flowchart TD
    # En Linux/macOS:
    source .venv/bin/activate
    ```
-   *(O utilizando `uv`: `uv venv .venv` y `.venv\Scripts\activate`)*
 
 2. **Instalar librerías necesarias**:
    ```bash
    pip install -r requirements.txt
-   # O con uv:
-   uv pip install -r requirements.txt
    ```
 
 3. **Configurar variables de entorno**:
@@ -166,7 +175,7 @@ flowchart TD
 
 ## Ejecución del Pipeline Integral
 
-Para ejecutar de principio a fin la extracción real, descarga de indicadores, guardado en HDFS y streaming con Kafka:
+Para ejecutar de principio a fin la extracción real, descarga de indicadores, cálculo de esfuerzo juvenil, guardado en HDFS y streaming con Kafka:
 
 ```bash
 python scripts/run_pipeline.py
@@ -175,7 +184,9 @@ python scripts/run_pipeline.py
 El script genera los siguientes ficheros en `data/raw/` y sube los originales a HDFS:
 - `data/raw/vivienda_api_YYYYMMDD.json` / `.csv`
 - `data/raw/vivienda_scraping_YYYYMMDD.json` / `.csv`
+- `data/raw/vivienda_pisos_YYYYMMDD.json` / `.csv`
 - `data/raw/indicadores_udalmap_YYYYMMDD.json` / `.csv`
+- `data/raw/indicadores_ovj_YYYYMMDD.json` / `.csv`
 
 ---
 
@@ -201,20 +212,20 @@ El código incluye un adaptador de simulación automática en `src/hdfs/client.p
 
 ## Ejecución de Pruebas Automatizadas
 
-La suite de pruebas comprueba la integridad de los modelos, el parseo de fuentes, el almacenamiento HDFS y el streaming en Kafka:
+La suite de pruebas comprueba la integridad de los modelos, el parseo de fuentes, el cálculo de esfuerzo juvenil, el almacenamiento HDFS y el streaming en Kafka:
 
 ```bash
 pytest tests/ -v
 ```
 
-Resultado esperado:
+Resultado verificado:
 ```text
-tests/test_extraction.py ................. PASSED
-tests/test_indicators.py ................. PASSED
-tests/test_hdfs.py ....................... PASSED
-tests/test_kafka.py ...................... PASSED
-tests/test_integration.py ................ PASSED
-12 passed in < 1s
+tests/test_extraction.py ................. PASSED (5 tests)
+tests/test_indicators.py ................. PASSED (6 tests)
+tests/test_hdfs.py ....................... PASSED (2 tests)
+tests/test_kafka.py ...................... PASSED (2 tests)
+tests/test_integration.py ................ PASSED (1 test)
+16 passed in < 1s
 ```
 
 ---

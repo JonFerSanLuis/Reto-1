@@ -8,6 +8,7 @@ import pytest
 from src.extraction.models import HousingAd, ExtractionResult
 from src.extraction.api_client import OpenDataEuskadiHousingClient
 from src.extraction.scraper import HabitacliaScraper
+from src.extraction.pisos_scraper import PisosComScraper
 
 
 def test_housing_ad_validation():
@@ -76,6 +77,43 @@ def test_scraper_parsing_html():
     assert ad.superficie_m2 == 80.0
     assert ad.habitaciones == 3
     assert ad.banos == 1
+
+
+def test_pisos_scraper_parsing_html():
+    """Verifica el parseo de un anuncio HTML proveniente de Pisos.com."""
+    scraper = PisosComScraper()
+    mock_html = """
+    <div class="ad-preview" data-ad-id="88123">
+        <h2 class="ad-preview__title">
+            <a href="/alquiler/piso-bilbao-88123.html">Piso luminoso en Abando</a>
+        </h2>
+        <div class="ad-preview__price">890 €/mes</div>
+        <div class="ad-preview__location">Abando, Bilbao</div>
+        <p class="description">Estupenda vivienda de 75 m² con 2 habitaciones y 1 baño exterior.</p>
+    </div>
+    """
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(mock_html, "html.parser")
+    card = soup.find("div", class_="ad-preview")
+    ad = scraper._extract_card_data(
+        card=card,
+        municipio="Bilbao",
+        provincia="Bizkaia",
+        tipo_operacion="alquiler",
+        index=0,
+        source_url="https://www.pisos.com/alquiler/viviendas-bilbao/"
+    )
+
+    assert ad is not None
+    assert ad.id == "pisos_88123"
+    assert ad.fuente == "PisosCom_Scraping"
+    assert ad.precio == 890.0
+    assert ad.superficie_m2 == 75.0
+    assert ad.habitaciones == 2
+    assert ad.banos == 1
+    assert ad.municipio == "Bilbao"
+    assert ad.provincia == "Bizkaia"
+    assert "https://www.pisos.com/alquiler/piso-bilbao-88123.html" in ad.url
 
 
 def test_save_json_and_csv():
