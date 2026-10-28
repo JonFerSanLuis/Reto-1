@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
 
-  <!-- Leaflet Cartografía Quirúrgica -->
+  <!-- Leaflet Cartografía -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -162,11 +162,12 @@
 
     #map-container {
       border-radius: 28px;
-      height: 520px;
+      height: 540px;
       width: 100%;
-      border: 0.5px solid rgba(0, 0, 0, 0.08);
-      background-color: #f7f7f8;
+      border: 0.5px solid rgba(0, 0, 0, 0.10);
+      background-color: #dbeaf7; /* Fondo azul suave que asegura mar visible */
       overflow: hidden;
+      position: relative;
     }
 
     /* Badges Inmobiliarias Personalizadas en el Mapa (L.divIcon) */
@@ -179,11 +180,11 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background-color: #fdfdfd;
-      border: 0.5px solid rgba(0, 0, 0, 0.18);
+      background-color: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.20);
       border-radius: 9999px;
-      padding: 4px 10px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      padding: 5px 11px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10);
       transition: all 0.15s ease-out;
       cursor: pointer;
       white-space: nowrap;
@@ -191,21 +192,21 @@
     }
 
     .muni-badge:hover {
-      transform: translateY(-2px);
+      transform: translateY(-2px) scale(1.05);
       border-color: var(--color-signal-blue);
-      box-shadow: 0 4px 8px rgba(0, 113, 227, 0.15);
+      box-shadow: 0 4px 10px rgba(0, 113, 227, 0.25);
     }
 
     .muni-badge.selected {
-      border: 1px solid var(--color-signal-blue) !important;
+      border: 1.5px solid var(--color-signal-blue) !important;
       background-color: #ffffff !important;
-      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.18) !important;
-      transform: scale(1.08);
+      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.25) !important;
+      transform: scale(1.10);
     }
 
     .muni-badge .dot {
-      width: 6px;
-      height: 6px;
+      width: 7px;
+      height: 7px;
       border-radius: 9999px;
       background-color: var(--color-off-black);
     }
@@ -214,34 +215,30 @@
       background-color: var(--color-signal-blue);
     }
 
-    .muni-badge.is-vpo .dot {
-      background-color: #0071e3;
-    }
-
     .muni-badge.is-tension .dot {
       background-color: #e02424;
     }
 
     .muni-badge .name {
       font-size: 11px;
-      font-weight: 400;
+      font-weight: 500;
       color: var(--color-off-black);
       letter-spacing: -0.2px;
     }
 
     .muni-badge .price {
       font-size: 11px;
-      font-weight: 400;
+      font-weight: 600;
       color: var(--color-signal-blue);
       letter-spacing: -0.2px;
     }
 
     /* Popup Leaflet Minimalista con Foto */
     .leaflet-popup-content-wrapper {
-      background-color: #fdfdfd !important;
+      background-color: #ffffff !important;
       border-radius: 18px !important;
-      border: 0.5px solid rgba(0, 0, 0, 0.12) !important;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+      border: 0.5px solid rgba(0, 0, 0, 0.15) !important;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important;
       padding: 0 !important;
       overflow: hidden !important;
     }
@@ -252,38 +249,38 @@
     }
 
     .leaflet-popup-tip {
-      background-color: #fdfdfd !important;
+      background-color: #ffffff !important;
       box-shadow: none !important;
     }
 
     /* Zoom Leaflet */
     .leaflet-control-zoom {
-      border: 0.5px solid rgba(0, 0, 0, 0.10) !important;
+      border: 0.5px solid rgba(0, 0, 0, 0.12) !important;
       border-radius: 12px !important;
       overflow: hidden !important;
       box-shadow: none !important;
     }
 
     .leaflet-control-zoom a {
-      background-color: #fdfdfd !important;
+      background-color: #ffffff !important;
       color: #0f1012 !important;
-      font-weight: 300 !important;
-      border-bottom: 0.5px solid rgba(0, 0, 0, 0.06) !important;
+      font-weight: 400 !important;
+      border-bottom: 0.5px solid rgba(0, 0, 0, 0.08) !important;
     }
 
-    /* SVG Map Hairline Styles */
+    /* SVG Map Styles */
     .map-province-contour {
       fill: #fdfdfd;
-      stroke: rgba(0, 0, 0, 0.18);
-      stroke-width: 0.75px;
+      stroke: rgba(0, 0, 0, 0.20);
+      stroke-width: 1px;
       transition: all 0.25s ease;
       cursor: pointer;
     }
 
     .map-province-contour:hover, .map-province-contour.active {
       stroke: var(--color-signal-blue);
-      stroke-width: 1.5px;
-      fill: rgba(0, 113, 227, 0.03);
+      stroke-width: 2px;
+      fill: rgba(0, 113, 227, 0.06);
     }
 
     .muni-node {
@@ -291,10 +288,10 @@
     }
 
     .muni-node:hover circle.pin, .muni-node.selected circle.pin {
-      r: 6.5px;
+      r: 7px;
       fill: var(--color-signal-blue);
       stroke: #ffffff;
-      stroke-width: 2px;
+      stroke-width: 2.5px;
     }
 
     /* Foto de la Vivienda y Animaciones */
@@ -302,14 +299,14 @@
       position: relative;
       border-radius: 20px;
       overflow: hidden;
-      border: 0.5px solid rgba(0, 0, 0, 0.08);
+      border: 0.5px solid rgba(0, 0, 0, 0.10);
       background-color: #f2f2f4;
     }
 
     .housing-img-container img {
       transition: transform 0.3s ease;
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
     }
 
@@ -321,7 +318,7 @@
     #lightbox-modal {
       display: none;
       backdrop-filter: blur(8px);
-      background-color: rgba(15, 16, 18, 0.75);
+      background-color: rgba(15, 16, 18, 0.80);
     }
 
     #lightbox-modal.active {
@@ -431,7 +428,7 @@
           <button onclick="setMapFilter('tension')" class="augen-tag inactive" id="btn-flt-tension">Tensionados (&gt;40%)</button>
           
           <div class="border-l border-black/[0.08] pl-2 ml-1 flex gap-1">
-            <button onclick="toggleMapMode('leaflet')" id="btn-mode-leaflet" class="augen-tag !text-[10px]">Carto Positron</button>
+            <button onclick="toggleMapMode('leaflet')" id="btn-mode-leaflet" class="augen-tag !text-[10px]">Mapa Leaflet</button>
             <button onclick="toggleMapMode('svg')" id="btn-mode-svg" class="augen-tag inactive !text-[10px]">Esquema Vectorial</button>
           </div>
         </div>
@@ -440,17 +437,25 @@
       <!-- Gran Card del Mapa (54px Radius) -->
       <div class="augen-card space-y-6">
         
-        <!-- Enfoques Territoriales Rápidos -->
+        <!-- Barra de Estilo de Mapa y Enfoques -->
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-black/[0.06] pb-4 text-[12px]">
-          <div class="text-[#5e5e5e] flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-[#0071e3]"></span>
-            <span>Haz clic en un municipio para desplegar la foto y ficha de su vivienda:</span>
+          
+          <!-- Selector de proveedor de teselas para asegurar máxima visibilidad -->
+          <div class="flex items-center gap-2">
+            <span class="text-[#8f8f8f]">Estilo de mapa:</span>
+            <button onclick="changeTileLayer('voyager')" id="btn-tile-voyager" class="augen-tag !py-0.5 !px-2.5 !text-[11px]">🗺️ Carto Voyager (Recomendado)</button>
+            <button onclick="changeTileLayer('osm')" id="btn-tile-osm" class="augen-tag inactive !py-0.5 !px-2.5 !text-[11px]">📐 OpenStreetMap</button>
+            <button onclick="changeTileLayer('satellite')" id="btn-tile-satellite" class="augen-tag inactive !py-0.5 !px-2.5 !text-[11px]">🛰️ Satélite Aéreo</button>
+            <button onclick="changeTileLayer('positron')" id="btn-tile-positron" class="augen-tag inactive !py-0.5 !px-2.5 !text-[11px]">⚪ Quirúrgico</button>
           </div>
-          <div class="flex flex-wrap gap-2">
-            <button onclick="zoomTerritory('all')" class="augen-tag !py-1 !text-[11px]" id="btn-zoom-all">Todo Euskadi</button>
-            <button onclick="zoomTerritory('Bizkaia')" class="augen-tag inactive !py-1 !text-[11px]" id="btn-zoom-Bizkaia">Bizkaia (Bilbao)</button>
-            <button onclick="zoomTerritory('Gipuzkoa')" class="augen-tag inactive !py-1 !text-[11px]" id="btn-zoom-Gipuzkoa">Gipuzkoa (Donostia)</button>
-            <button onclick="zoomTerritory('Araba')" class="augen-tag inactive !py-1 !text-[11px]" id="btn-zoom-Araba">Araba (Vitoria)</button>
+
+          <!-- Enfoques Territoriales -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-[#8f8f8f]">Zoom:</span>
+            <button onclick="zoomTerritory('all')" class="augen-tag !py-0.5 !px-2 !text-[11px]" id="btn-zoom-all">Euskadi</button>
+            <button onclick="zoomTerritory('Bizkaia')" class="augen-tag inactive !py-0.5 !px-2 !text-[11px]" id="btn-zoom-Bizkaia">Bizkaia</button>
+            <button onclick="zoomTerritory('Gipuzkoa')" class="augen-tag inactive !py-0.5 !px-2 !text-[11px]" id="btn-zoom-Gipuzkoa">Gipuzkoa</button>
+            <button onclick="zoomTerritory('Araba')" class="augen-tag inactive !py-0.5 !px-2 !text-[11px]" id="btn-zoom-Araba">Araba</button>
           </div>
         </div>
 
@@ -459,80 +464,80 @@
           <!-- Lienzo Cartográfico (7 cols) -->
           <div class="lg:col-span-7 space-y-3">
             
-            <!-- Contenedor Leaflet Positron -->
+            <!-- Contenedor Leaflet Visible y Contrastado -->
             <div id="wrapper-leaflet" class="relative">
               <div id="map-container"></div>
               
               <!-- Badge indicador superior derecho -->
-              <div class="absolute top-3 right-3 z-[400] bg-white/95 backdrop-blur-sm border border-black/[0.08] rounded-[10px] px-3 py-1.5 text-[11px] text-[#5e5e5e] flex items-center gap-2">
-                <span class="inline-block w-2 h-2 rounded-full bg-[#0071e3]"></span>
+              <div class="absolute top-3 right-3 z-[400] bg-white/95 backdrop-blur-sm border border-black/[0.12] rounded-[10px] px-3 py-1.5 text-[11px] text-[#0f1012] flex items-center gap-2 shadow-sm">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#0071e3]"></span>
                 <span id="map-status-pill">16 municipios activos</span>
               </div>
             </div>
 
             <!-- Contenedor SVG Vectorial Hairline (Alternativo) -->
-            <div id="wrapper-svg" class="hidden bg-[#fdfdfd] rounded-[28px] border border-black/[0.08] p-6 relative">
-              <div class="absolute top-4 left-6 z-10 space-y-0.5">
+            <div id="wrapper-svg" class="hidden bg-[#e8f2fc] rounded-[28px] border border-black/[0.08] p-6 relative overflow-hidden">
+              <div class="absolute top-4 left-6 z-10 space-y-0.5 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-[10px] border border-black/[0.08]">
                 <span class="text-[10px] uppercase font-mono tracking-wider text-[#8f8f8f]">Selección Activa</span>
-                <div id="svg-active-label" class="text-[16px] font-light text-[#0f1012]">Euskadi General</div>
+                <div id="svg-active-label" class="text-[15px] font-normal text-[#0f1012]">Euskadi General</div>
               </div>
 
-              <svg viewBox="0 0 820 540" class="w-full h-auto max-h-[460px]">
-                <defs>
-                  <pattern id="grid-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0,0,0,0.02)" stroke-width="0.5"/>
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#grid-pattern)" />
+              <svg viewBox="0 0 820 540" class="w-full h-auto max-h-[480px]">
+                <!-- Mar Cantábrico (Fondo con ondas sutiles) -->
+                <rect width="100%" height="220" fill="#d9eaf7" />
+                <path d="M 0,220 Q 150,180 300,210 T 600,190 T 820,200 L 820,0 L 0,0 Z" fill="#cfe3f5" opacity="0.6"/>
+                <text x="320" y="60" fill="#5885aa" font-size="11" font-weight="400" letter-spacing="2">GOLFO DE BIZKAIA / MAR CANTÁBRICO</text>
 
-                <!-- Costa Cantábrica -->
-                <path d="M 50,140 Q 140,80 230,120 T 400,90 T 560,110 T 730,130" fill="none" stroke="rgba(0, 113, 227, 0.25)" stroke-width="0.75" stroke-dasharray="3,3"/>
-                <text x="320" y="70" fill="#8f8f8f" font-size="10" font-weight="300" letter-spacing="2">MAR CANTÁBRICO / GOLFO DE BIZKAIA</text>
-
+                <!-- Costa e Interior Terrestre -->
                 <!-- Bizkaia -->
                 <path id="prov-path-bizkaia" class="map-province-contour active"
                   d="M 90,160 Q 160,100 280,125 Q 360,150 365,220 Q 330,270 240,290 Q 140,280 100,210 Z"
                   onclick="selectMunicipality('Bilbao')">
                 </path>
-                <text x="180" y="240" fill="#8f8f8f" font-size="12" font-weight="300" pointer-events="none" letter-spacing="1">BIZKAIA</text>
+                <text x="180" y="240" fill="#0f1012" font-size="13" font-weight="400" pointer-events="none" letter-spacing="1">BIZKAIA</text>
 
                 <!-- Gipuzkoa -->
                 <path id="prov-path-gipuzkoa" class="map-province-contour"
                   d="M 370,160 Q 450,100 620,120 Q 680,170 600,280 Q 480,300 375,230 Z"
                   onclick="selectMunicipality('Donostia')">
                 </path>
-                <text x="490" y="240" fill="#8f8f8f" font-size="12" font-weight="300" pointer-events="none" letter-spacing="1">GIPUZKOA</text>
+                <text x="490" y="240" fill="#0f1012" font-size="13" font-weight="400" pointer-events="none" letter-spacing="1">GIPUZKOA</text>
 
                 <!-- Araba -->
                 <path id="prov-path-araba" class="map-province-contour"
                   d="M 170,305 Q 350,270 510,310 Q 550,420 440,490 Q 240,510 160,390 Q 145,340 170,305 Z"
                   onclick="selectMunicipality('Vitoria')">
                 </path>
-                <text x="330" y="420" fill="#8f8f8f" font-size="12" font-weight="300" pointer-events="none" letter-spacing="1">ARABA / ÁLAVA</text>
+                <text x="330" y="420" fill="#0f1012" font-size="13" font-weight="400" pointer-events="none" letter-spacing="1">ARABA / ÁLAVA</text>
+
+                <!-- Ejes de comunicación (Carreteras) -->
+                <line x1="230" y1="195" x2="330" y2="365" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4,4"/>
+                <line x1="230" y1="195" x2="530" y2="155" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4,4"/>
+                <line x1="330" y1="365" x2="530" y2="155" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4,4"/>
 
                 <!-- Nodos Municipales SVG -->
                 <g class="muni-node selected" id="node-Bilbao" onclick="selectMunicipality('Bilbao')">
-                  <circle cx="230" cy="195" r="5" class="pin" fill="#0f1012" stroke="#ffffff" stroke-width="1.5"/>
-                  <text x="242" y="199" fill="#0f1012" font-size="11" font-weight="400">Bilbao (950 €)</text>
+                  <circle cx="230" cy="195" r="5.5" class="pin" fill="#0f1012" stroke="#ffffff" stroke-width="2"/>
+                  <text x="242" y="199" fill="#0f1012" font-size="11" font-weight="500">Bilbao (950 €)</text>
                 </g>
                 <g class="muni-node" id="node-Getxo" onclick="selectMunicipality('Getxo')">
-                  <circle cx="190" cy="165" r="4" class="pin" fill="#5e5e5e"/>
+                  <circle cx="190" cy="165" r="4.5" class="pin" fill="#5e5e5e"/>
                   <text x="135" y="162" fill="#5e5e5e" font-size="10">Getxo (1.150 €)</text>
                 </g>
                 <g class="muni-node" id="node-Donostia" onclick="selectMunicipality('Donostia')">
-                  <circle cx="530" cy="155" r="5" class="pin" fill="#0f1012" stroke="#ffffff" stroke-width="1.5"/>
-                  <text x="542" y="159" fill="#0f1012" font-size="11" font-weight="400">Donostia (1.250 €)</text>
+                  <circle cx="530" cy="155" r="5.5" class="pin" fill="#0f1012" stroke="#ffffff" stroke-width="2"/>
+                  <text x="542" y="159" fill="#0f1012" font-size="11" font-weight="500">Donostia (1.250 €)</text>
                 </g>
                 <g class="muni-node" id="node-Zarautz" onclick="selectMunicipality('Zarautz')">
-                  <circle cx="450" cy="165" r="4" class="pin" fill="#5e5e5e"/>
+                  <circle cx="450" cy="165" r="4.5" class="pin" fill="#5e5e5e"/>
                   <text x="395" y="155" fill="#5e5e5e" font-size="10">Zarautz (1.050 €)</text>
                 </g>
                 <g class="muni-node" id="node-Vitoria" onclick="selectMunicipality('Vitoria')">
-                  <circle cx="330" cy="365" r="5" class="pin" fill="#0f1012" stroke="#ffffff" stroke-width="1.5"/>
-                  <text x="342" y="369" fill="#0f1012" font-size="11" font-weight="400">Vitoria-Gasteiz (780 €)</text>
+                  <circle cx="330" cy="365" r="5.5" class="pin" fill="#0f1012" stroke="#ffffff" stroke-width="2"/>
+                  <text x="342" y="369" fill="#0f1012" font-size="11" font-weight="500">Vitoria-Gasteiz (780 €)</text>
                 </g>
                 <g class="muni-node" id="node-Agurain" onclick="selectMunicipality('Agurain')">
-                  <circle cx="440" cy="355" r="4" class="pin" fill="#5e5e5e"/>
+                  <circle cx="440" cy="355" r="4.5" class="pin" fill="#5e5e5e"/>
                   <text x="448" y="358" fill="#5e5e5e" font-size="10">Agurain (620 €)</text>
                 </g>
               </svg>
@@ -542,10 +547,10 @@
             <div class="flex flex-wrap items-center justify-between text-[11px] text-[#5e5e5e] pt-1">
               <div class="flex items-center gap-4">
                 <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#0071e3]"></span> Capital / Principal</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#e02424]"></span> Mercado Tensionado</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#e02424]"></span> Mercado Tensionado (&gt;40%)</span>
                 <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#0f1012]"></span> Cabecera Comarcal</span>
               </div>
-              <span class="text-[#8f8f8f]">Haz clic en la foto de la vivienda para ampliarla</span>
+              <span class="text-[#8f8f8f]">Pulsa en cualquier badge para ver la foto de su vivienda</span>
             </div>
           </div>
 
@@ -558,16 +563,16 @@
               
               <!-- Badges superpuestas en la foto -->
               <div class="absolute top-3 left-3 flex gap-2">
-                <span id="muni-photo-badge" class="bg-black/60 backdrop-blur-md text-white border border-white/20 text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-[9999px]">
+                <span id="muni-photo-badge" class="bg-black/70 backdrop-blur-md text-white border border-white/20 text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-[9999px]">
                   VPO Alquiler
                 </span>
-                <span id="muni-zone-badge" class="bg-black/60 backdrop-blur-md text-white border border-white/20 text-[10px] px-2.5 py-0.5 rounded-[9999px]">
+                <span id="muni-zone-badge" class="bg-black/70 backdrop-blur-md text-white border border-white/20 text-[10px] px-2.5 py-0.5 rounded-[9999px]">
                   Zorrotzaurre
                 </span>
               </div>
 
               <!-- Icono de Zoom -->
-              <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md text-white rounded-full w-7 h-7 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
+              <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-md text-white rounded-full w-8 h-8 flex items-center justify-center opacity-90 group-hover:opacity-100 transition-opacity">
                 <span class="text-xs">⤢</span>
               </div>
             </div>
@@ -580,7 +585,7 @@
               </div>
               <h3 id="muni-name-header" class="text-[22px] font-light text-[#0f1012]">Bilbao • Zorrotzaurre 113</h3>
               <p id="muni-desc-text" class="text-[12px] text-[#5e5e5e] leading-relaxed">
-                113 babes ofizialeko etxebizitzak alokairuan Zorrotzaurren. Edificio bioclimático de alta eficiencia energética.
+                113 babes ofizialeko etxebizitzak alokairuan Zorrotzaurren. Edificio bioclimático de alta eficiencia energética frente a la ría.
               </p>
             </div>
 
@@ -1092,9 +1097,34 @@
     let currentSalary = 1410.0;
     let gaztelagunActive = true;
     let leafletMap = null;
+    let currentTileLayer = null;
     let leafletMarkersLayer = null;
     let leafletProvincesLayer = null;
     let currentActiveFilter = "all";
+
+    // Teselas Cartográficas Disponibles
+    const tileProviders = {
+      // Carto Voyager: Nítido, mar azul claro, relieve verde, ciudades y carreteras perfectamente visibles
+      voyager: {
+        url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        options: { maxZoom: 18, subdomains: "abcd" }
+      },
+      // OpenStreetMap: Callejero de alto contraste clásico
+      osm: {
+        url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        options: { maxZoom: 19 }
+      },
+      // Satélite Esri: Fotografía aérea real
+      satellite: {
+        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        options: { maxZoom: 18 }
+      },
+      // Carto Positron: Monocromático
+      positron: {
+        url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        options: { maxZoom: 18, subdomains: "abcd" }
+      }
+    };
 
     // INICIALIZACIÓN DEL MAPA LEAFLET QUIRÚRGICO (Augen Pro)
     function initLeafletMap() {
@@ -1106,32 +1136,29 @@
         zoomControl: true,
         attributionControl: false,
         minZoom: 8,
-        maxZoom: 15
+        maxZoom: 16
       });
 
-      // Teselas CartoDB Positron
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-        maxZoom: 18,
-        subdomains: "abcd"
-      }).addTo(leafletMap);
+      // Añadir capa inicial: Voyager (mar azul, relieve visible y limpio)
+      changeTileLayer("voyager");
 
       // Dibujar polígonos provinciales sutiles
       leafletProvincesLayer = L.layerGroup().addTo(leafletMap);
       Object.keys(provincesPolygons).forEach(terr => {
         const poly = L.polygon(provincesPolygons[terr], {
-          color: "#0f1012",
-          weight: 0.75,
-          opacity: 0.35,
+          color: "#0071e3",
+          weight: 1.2,
+          opacity: 0.45,
           fillColor: "#0071e3",
-          fillOpacity: 0.02,
+          fillOpacity: 0.04,
           dashArray: "3, 3"
         });
 
         poly.on("mouseover", () => {
-          poly.setStyle({ color: "#0071e3", weight: 1.5, fillOpacity: 0.06, dashArray: "" });
+          poly.setStyle({ color: "#0071e3", weight: 2, fillOpacity: 0.08, dashArray: "" });
         });
         poly.on("mouseout", () => {
-          poly.setStyle({ color: "#0f1012", weight: 0.75, fillOpacity: 0.02, dashArray: "3, 3" });
+          poly.setStyle({ color: "#0071e3", weight: 1.2, fillOpacity: 0.04, dashArray: "3, 3" });
         });
         poly.on("click", () => {
           zoomTerritory(terr);
@@ -1150,10 +1177,29 @@
 
       renderMapMarkers(currentActiveFilter);
 
-      // Solución para asegurar cálculo correcto del viewport tras renderizar fuentes
+      // Forzar recálculo del layout de teselas para asegurar visualización inmediata
       setTimeout(() => {
-        if (leafletMap) leafletMap.invalidateSize();
-      }, 250);
+        if (leafletMap) {
+          leafletMap.invalidateSize();
+          leafletMap.fitBounds([
+            [42.48, -3.35],
+            [43.48, -1.72]
+          ], { padding: [25, 25] });
+        }
+      }, 300);
+    }
+
+    // Cambiar capa de teselas
+    function changeTileLayer(key) {
+      if (!leafletMap) return;
+      if (currentTileLayer) leafletMap.removeLayer(currentTileLayer);
+
+      const prov = tileProviders[key] || tileProviders.voyager;
+      currentTileLayer = L.tileLayer(prov.url, prov.options).addTo(leafletMap);
+
+      document.querySelectorAll("[id^='btn-tile-']").forEach(b => b.classList.add("inactive"));
+      const btn = document.getElementById(`btn-tile-${key}`);
+      if (btn) btn.classList.remove("inactive");
     }
 
     // Renderizar Badges Inmobiliarias usando L.divIcon
@@ -1188,8 +1234,8 @@
         const icon = L.divIcon({
           className: "muni-badge-wrapper",
           html: badgeHtml,
-          iconSize: [110, 26],
-          iconAnchor: [55, 13]
+          iconSize: [110, 28],
+          iconAnchor: [55, 14]
         });
 
         const marker = L.marker([item.lat, item.lng], {
@@ -1197,16 +1243,16 @@
           zIndexOffset: isSelected ? 1000 : (item.isCapital ? 500 : 100)
         });
 
-        // Popup con mini-foto al hacer clic o hover
+        // Popup con mini-foto al hacer clic
         marker.bindPopup(`
-          <div style="width: 200px; font-family: inherit;">
-            <div style="height: 100px; overflow: hidden; background: #eee;">
+          <div style="width: 210px; font-family: inherit;">
+            <div style="height: 110px; overflow: hidden; background: #eee;">
               <img src="${item.image}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: cover;">
             </div>
             <div style="padding: 10px;">
               <div style="font-size: 10px; color: #8f8f8f; text-transform: uppercase;">${item.promoType}</div>
-              <div style="font-size: 13px; font-weight: 400; color: #0f1012; margin-top: 2px;">${item.promoTitle}</div>
-              <div style="font-size: 12px; color: #0071e3; margin-top: 4px; font-weight: 500;">Alquiler: ${item.avgRent} €/mes</div>
+              <div style="font-size: 13px; font-weight: 500; color: #0f1012; margin-top: 2px;">${item.promoTitle}</div>
+              <div style="font-size: 12px; color: #0071e3; margin-top: 4px; font-weight: 600;">Alquiler: ${item.avgRent} €/mes</div>
             </div>
           </div>
         `, { closeButton: false, offset: [0, -10] });
@@ -1218,7 +1264,7 @@
         leafletMarkersLayer.addLayer(marker);
       });
 
-      document.getElementById("map-status-pill").innerText = `${count} municipios mostrados`;
+      document.getElementById("map-status-pill").innerText = `${count} municipios activos`;
     }
 
     function setMapFilter(flt) {
