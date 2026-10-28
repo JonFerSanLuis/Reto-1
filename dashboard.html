@@ -8,12 +8,12 @@
   <!-- Tipografía Whisper-Weight y Tailwind -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
 
   <!-- Leaflet Cartografía Quirúrgica -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
     :root {
@@ -27,7 +27,6 @@
     }
 
     * {
-      box-shadow: none !important;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -79,11 +78,12 @@
       border-radius: 54px;
       border: 0.5px solid rgba(0, 0, 0, 0.06);
       padding: 40px 32px;
+      box-shadow: none !important;
     }
 
     @media (min-width: 768px) {
       .augen-card {
-        padding: 60px 69px;
+        padding: 50px 60px;
       }
     }
 
@@ -93,24 +93,24 @@
       border: 0.5px solid var(--color-signal-blue);
       color: var(--color-signal-blue);
       background: transparent;
-      padding: 3px 12px;
-      font-size: 11px;
+      padding: 4px 14px;
+      font-size: 12px;
       font-weight: 300;
       letter-spacing: -0.2px;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       transition: all 0.15s ease;
       cursor: pointer;
     }
 
     .augen-tag.inactive {
-      border-color: rgba(0, 0, 0, 0.10);
+      border-color: rgba(0, 0, 0, 0.12);
       color: var(--color-steel-gray);
     }
 
     .augen-tag:hover:not(.inactive) {
-      background: rgba(0, 113, 227, 0.03);
+      background: rgba(0, 113, 227, 0.04);
     }
 
     .augen-link {
@@ -143,34 +143,103 @@
       cursor: pointer;
     }
 
-    /* Leaflet Overrides para encajar en estética quirúrgica */
+    /* ==========================================================================
+       FIX CRÍTICO DE COMPATIBILIDAD LEAFLET + TAILWIND CSS
+       Evita que el CSS reset de Tailwind rompa las teselas de Leaflet
+       ========================================================================== */
+    .leaflet-container img {
+      max-width: none !important;
+      max-height: none !important;
+    }
+
+    .leaflet-tile {
+      max-width: none !important;
+      max-height: none !important;
+    }
+
+    .leaflet-pane {
+      z-index: 10 !important;
+    }
+
     #map-container {
-      border-radius: 36px;
-      height: 480px;
+      border-radius: 28px;
+      height: 520px;
       width: 100%;
-      border: 0.5px solid rgba(0, 0, 0, 0.06);
+      border: 0.5px solid rgba(0, 0, 0, 0.08);
+      background-color: #f7f7f8;
+      overflow: hidden;
+    }
+
+    /* Badges Inmobiliarias Personalizadas en el Mapa (L.divIcon) */
+    .muni-badge-wrapper {
+      background: transparent;
+      border: none;
+    }
+
+    .muni-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       background-color: #fdfdfd;
-      z-index: 10;
+      border: 0.5px solid rgba(0, 0, 0, 0.18);
+      border-radius: 9999px;
+      padding: 4px 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      transition: all 0.15s ease-out;
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
     }
 
-    .leaflet-popup-content-wrapper {
-      background-color: var(--color-pure-white) !important;
-      border-radius: 18px !important;
-      border: 0.5px solid rgba(0, 0, 0, 0.10) !important;
-      box-shadow: none !important;
-      padding: 6px 8px !important;
-      color: var(--color-off-black) !important;
-      font-family: inherit !important;
-      letter-spacing: -0.02em !important;
+    .muni-badge:hover {
+      transform: translateY(-2px);
+      border-color: var(--color-signal-blue);
+      box-shadow: 0 4px 8px rgba(0, 113, 227, 0.15);
     }
 
-    .leaflet-popup-tip {
-      background-color: var(--color-pure-white) !important;
-      box-shadow: none !important;
+    .muni-badge.selected {
+      border: 1px solid var(--color-signal-blue) !important;
+      background-color: #ffffff !important;
+      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.18) !important;
+      transform: scale(1.08);
     }
 
+    .muni-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 9999px;
+      background-color: var(--color-off-black);
+    }
+
+    .muni-badge.selected .dot, .muni-badge.is-capital .dot {
+      background-color: var(--color-signal-blue);
+    }
+
+    .muni-badge.is-vpo .dot {
+      background-color: #0071e3;
+    }
+
+    .muni-badge.is-tension .dot {
+      background-color: #e02424;
+    }
+
+    .muni-badge .name {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--color-off-black);
+      letter-spacing: -0.2px;
+    }
+
+    .muni-badge .price {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--color-signal-blue);
+      letter-spacing: -0.2px;
+    }
+
+    /* Controles de Zoom Leaflet Augen */
     .leaflet-control-zoom {
-      border: 0.5px solid rgba(0, 0, 0, 0.08) !important;
+      border: 0.5px solid rgba(0, 0, 0, 0.10) !important;
       border-radius: 12px !important;
       overflow: hidden !important;
       box-shadow: none !important;
@@ -186,7 +255,7 @@
     /* SVG Map Hairline Styles */
     .map-province-contour {
       fill: #fdfdfd;
-      stroke: rgba(0, 0, 0, 0.15);
+      stroke: rgba(0, 0, 0, 0.18);
       stroke-width: 0.75px;
       transition: all 0.25s ease;
       cursor: pointer;
@@ -194,27 +263,22 @@
 
     .map-province-contour:hover, .map-province-contour.active {
       stroke: var(--color-signal-blue);
-      stroke-width: 1.25px;
-      fill: rgba(0, 113, 227, 0.02);
+      stroke-width: 1.5px;
+      fill: rgba(0, 113, 227, 0.03);
     }
 
     .muni-node {
       cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .muni-node circle.pin {
-      transition: r 0.2s ease, fill 0.2s ease, stroke 0.2s ease;
     }
 
     .muni-node:hover circle.pin, .muni-node.selected circle.pin {
-      r: 6px;
+      r: 6.5px;
       fill: var(--color-signal-blue);
       stroke: #ffffff;
       stroke-width: 2px;
     }
 
-    /* Estilos de Impresión Ejecutiva */
+    /* Estilos de Impresión */
     @media print {
       nav, footer, #view-switcher, .no-print {
         display: none !important;
@@ -224,7 +288,6 @@
       }
       .augen-card {
         border: 1px solid #ddd !important;
-        page-break-inside: avoid;
       }
     }
   </style>
@@ -232,7 +295,7 @@
 <body class="selection:bg-slate-200">
 
   <!-- NAVEGACIÓN FLOTANTE TIPO PILL -->
-  <nav class="sticky top-6 z-50 flex justify-center px-4 mb-16 no-print">
+  <nav class="sticky top-6 z-50 flex justify-center px-4 mb-14 no-print">
     <div class="bg-[#fdfdfd] border border-black/[0.06] rounded-[10px] px-6 py-2.5 flex items-center gap-6">
       <div class="flex items-center gap-2">
         <span class="text-xs text-[#0f1012]">✦</span>
@@ -255,22 +318,22 @@
   </nav>
 
   <!-- CONTENEDOR CENTRAL: MAX 1200PX, RITMO VERTICAL 94PX -->
-  <main class="max-w-[1200px] mx-auto px-6 space-y-[94px]">
+  <main class="max-w-[1200px] mx-auto px-6 space-y-[90px]">
 
     <!-- HERO OVERVIEW -->
     <section class="space-y-8">
       <div class="flex items-center gap-3">
-        <span class="augen-tag">FASE 1</span>
-        <span class="text-[13px] text-[#5e5e5e]">Estudio integral de acceso a la vivienda para la juventud en Euskadi</span>
+        <span class="augen-tag">FASE 1 OFICIAL</span>
+        <span class="text-[13px] text-[#5e5e5e]">Estudio integral de acceso residencial juvenil y capacidad de emancipación en Euskadi</span>
       </div>
 
       <div class="space-y-2">
-        <div class="augen-caption">OVERVIEW / CARTOGRAFÍA & INVESTIGACIÓN</div>
+        <div class="augen-caption">OVERVIEW / CARTOGRAFÍA & INVESTIGACIÓN TERRITORIAL</div>
         <h1 class="augen-heading max-w-3xl">
           ¿Dónde pueden vivir los jóvenes en Euskadi?
         </h1>
         <p class="augen-body text-[#5e5e5e] max-w-2xl pt-1">
-          Cruce empírico de 217 promociones públicas de Visesa, ofertas reales de mercado libre y el efecto mitigador del programa autonómico de ayuda al alquiler <span class="text-[#0f1012]">Gaztelagun</span>.
+          Cruce territorial de 217 promociones públicas de Visesa, ofertas reales de mercado libre y el efecto mitigador del programa de subvención autonómica <span class="text-[#0f1012]">Gaztelagun</span>.
         </p>
       </div>
 
@@ -291,7 +354,7 @@
         <div class="bg-[#fdfdfd] border border-black/[0.06] rounded-[26px] p-6 space-y-1">
           <div class="augen-caption">SALARIO MEDIO JOVEN</div>
           <div class="text-[27px] font-light text-[#0f1012] tracking-tight">1.420 €</div>
-          <div class="text-[12px] text-[#5e5e5e] pt-1">Media neta (18-29 años, OVJ)</div>
+          <div class="text-[12px] text-[#5e5e5e] pt-1">Media neta mensual (18-29, OVJ)</div>
         </div>
 
         <div class="bg-[#fdfdfd] border border-black/[0.06] rounded-[26px] p-6 space-y-1">
@@ -306,8 +369,8 @@
     <section id="cartografia" class="space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
         <div class="space-y-1">
-          <div class="augen-caption">CARTOGRAFÍA / DISTRIBUCIÓN TERRITORIAL Y OFERTA</div>
-          <h2 class="augen-heading">Mapa Territorial de Euskadi</h2>
+          <div class="augen-caption">CARTOGRAFÍA / DISTRIBUCIÓN TERRITORIAL Y PRECIOS</div>
+          <h2 class="augen-heading">Geografía Residencial de Euskadi</h2>
         </div>
 
         <!-- Selector de Capas / Filtros -->
@@ -315,40 +378,56 @@
           <span class="text-[11px] text-[#8f8f8f] mr-1">Filtro:</span>
           <button onclick="setMapFilter('all')" class="augen-tag" id="btn-flt-all">Todos (16)</button>
           <button onclick="setMapFilter('visesa')" class="augen-tag inactive" id="btn-flt-visesa">VPO Visesa</button>
-          <button onclick="setMapFilter('libre')" class="augen-tag inactive" id="btn-flt-libre">Mercado Libre</button>
-          <button onclick="setMapFilter('tension')" class="augen-tag inactive" id="btn-flt-tension">Zonas Tensionadas</button>
+          <button onclick="setMapFilter('tension')" class="augen-tag inactive" id="btn-flt-tension">Tensionados (&gt;40%)</button>
           
           <div class="border-l border-black/[0.08] pl-2 ml-1 flex gap-1">
-            <button onclick="toggleMapMode('leaflet')" id="btn-mode-leaflet" class="augen-tag !text-[10px]">Leaflet Positron</button>
+            <button onclick="toggleMapMode('leaflet')" id="btn-mode-leaflet" class="augen-tag !text-[10px]">Carto Positron</button>
             <button onclick="toggleMapMode('svg')" id="btn-mode-svg" class="augen-tag inactive !text-[10px]">Esquema Vectorial</button>
           </div>
         </div>
       </div>
 
       <!-- Gran Card del Mapa (54px Radius) -->
-      <div class="augen-card space-y-8">
+      <div class="augen-card space-y-6">
+        
+        <!-- Enfoques Territoriales Rápidos -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-black/[0.06] pb-4 text-[12px]">
+          <div class="text-[#5e5e5e] flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#0071e3]"></span>
+            <span>Enfoque territorial:</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="zoomTerritory('all')" class="augen-tag !py-1 !text-[11px]" id="btn-zoom-all">Todo Euskadi</button>
+            <button onclick="zoomTerritory('Bizkaia')" class="augen-tag inactive !py-1 !text-[11px]" id="btn-zoom-Bizkaia">Bizkaia (Bilbao)</button>
+            <button onclick="zoomTerritory('Gipuzkoa')" class="augen-tag inactive !py-1 !text-[11px]" id="btn-zoom-Gipuzkoa">Gipuzkoa (Donostia)</button>
+            <button onclick="zoomTerritory('Araba')" class="augen-tag inactive !py-1 !text-[11px]" id="btn-zoom-Araba">Araba (Vitoria)</button>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           <!-- Lienzo Cartográfico (8 cols) -->
-          <div class="lg:col-span-8 space-y-4">
+          <div class="lg:col-span-8 space-y-3">
             
-            <!-- Contenedor Leaflet Positron (Modo Principal) -->
+            <!-- Contenedor Leaflet Positron -->
             <div id="wrapper-leaflet" class="relative">
               <div id="map-container"></div>
-              <div class="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-sm border border-black/[0.06] rounded-[10px] px-3 py-1.5 text-[11px] text-[#5e5e5e] flex items-center gap-2">
+              
+              <!-- Badge indicador superior derecho -->
+              <div class="absolute top-3 right-3 z-[400] bg-white/95 backdrop-blur-sm border border-black/[0.08] rounded-[10px] px-3 py-1.5 text-[11px] text-[#5e5e5e] flex items-center gap-2">
                 <span class="inline-block w-2 h-2 rounded-full bg-[#0071e3]"></span>
-                <span>CartoDB Positron Surgical White</span>
+                <span id="map-status-pill">16 municipios cargados</span>
               </div>
             </div>
 
-            <!-- Contenedor SVG Vectorial Hairline (Modo Alternativo) -->
-            <div id="wrapper-svg" class="hidden bg-[#fdfdfd] rounded-[36px] border border-black/[0.06] p-4 sm:p-6 relative">
-              <div class="absolute top-6 left-6 z-10 space-y-0.5">
+            <!-- Contenedor SVG Vectorial Hairline (Alternativo) -->
+            <div id="wrapper-svg" class="hidden bg-[#fdfdfd] rounded-[28px] border border-black/[0.08] p-6 relative">
+              <div class="absolute top-4 left-6 z-10 space-y-0.5">
                 <span class="text-[10px] uppercase font-mono tracking-wider text-[#8f8f8f]">Selección Activa</span>
                 <div id="svg-active-label" class="text-[16px] font-light text-[#0f1012]">Euskadi General</div>
               </div>
 
-              <svg viewBox="0 0 820 540" class="w-full h-auto max-h-[440px]">
+              <svg viewBox="0 0 820 540" class="w-full h-auto max-h-[460px]">
                 <defs>
                   <pattern id="grid-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
                     <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0,0,0,0.02)" stroke-width="0.5"/>
@@ -357,7 +436,7 @@
                 <rect width="100%" height="100%" fill="url(#grid-pattern)" />
 
                 <!-- Costa Cantábrica -->
-                <path d="M 60,140 Q 140,80 230,120 T 400,90 T 560,110 T 720,130" fill="none" stroke="rgba(0, 113, 227, 0.20)" stroke-width="0.5" stroke-dasharray="3,3"/>
+                <path d="M 50,140 Q 140,80 230,120 T 400,90 T 560,110 T 730,130" fill="none" stroke="rgba(0, 113, 227, 0.25)" stroke-width="0.75" stroke-dasharray="3,3"/>
                 <text x="320" y="70" fill="#8f8f8f" font-size="10" font-weight="300" letter-spacing="2">MAR CANTÁBRICO / GOLFO DE BIZKAIA</text>
 
                 <!-- Bizkaia -->
@@ -383,44 +462,40 @@
 
                 <!-- Nodos Municipales SVG -->
                 <g class="muni-node selected" id="node-Bilbao" onclick="selectMunicipality('Bilbao')">
-                  <circle cx="230" cy="195" r="4.5" class="pin" fill="#0f1012" stroke="#fdfdfd" stroke-width="1.5"/>
-                  <text x="242" y="199" fill="#0f1012" font-size="11" font-weight="300">Bilbao</text>
+                  <circle cx="230" cy="195" r="5" class="pin" fill="#0f1012" stroke="#ffffff" stroke-width="1.5"/>
+                  <text x="242" y="199" fill="#0f1012" font-size="11" font-weight="400">Bilbao (950 €)</text>
                 </g>
                 <g class="muni-node" id="node-Getxo" onclick="selectMunicipality('Getxo')">
-                  <circle cx="190" cy="165" r="3.5" class="pin" fill="#5e5e5e"/>
-                  <text x="145" y="162" fill="#5e5e5e" font-size="10" font-weight="300">Getxo</text>
-                </g>
-                <g class="muni-node" id="node-Barakaldo" onclick="selectMunicipality('Barakaldo')">
-                  <circle cx="210" cy="205" r="3.5" class="pin" fill="#5e5e5e"/>
-                  <text x="150" y="215" fill="#5e5e5e" font-size="10" font-weight="300">Barakaldo</text>
+                  <circle cx="190" cy="165" r="4" class="pin" fill="#5e5e5e"/>
+                  <text x="135" y="162" fill="#5e5e5e" font-size="10">Getxo (1.150 €)</text>
                 </g>
                 <g class="muni-node" id="node-Donostia" onclick="selectMunicipality('Donostia')">
-                  <circle cx="530" cy="155" r="4.5" class="pin" fill="#0f1012" stroke="#fdfdfd" stroke-width="1.5"/>
-                  <text x="542" y="159" fill="#0f1012" font-size="11" font-weight="300">Donostia</text>
+                  <circle cx="530" cy="155" r="5" class="pin" fill="#0f1012" stroke="#ffffff" stroke-width="1.5"/>
+                  <text x="542" y="159" fill="#0f1012" font-size="11" font-weight="400">Donostia (1.250 €)</text>
                 </g>
                 <g class="muni-node" id="node-Zarautz" onclick="selectMunicipality('Zarautz')">
-                  <circle cx="450" cy="165" r="3.5" class="pin" fill="#5e5e5e"/>
-                  <text x="410" y="155" fill="#5e5e5e" font-size="10" font-weight="300">Zarautz</text>
+                  <circle cx="450" cy="165" r="4" class="pin" fill="#5e5e5e"/>
+                  <text x="395" y="155" fill="#5e5e5e" font-size="10">Zarautz (1.050 €)</text>
                 </g>
                 <g class="muni-node" id="node-Vitoria" onclick="selectMunicipality('Vitoria')">
-                  <circle cx="330" cy="365" r="4.5" class="pin" fill="#0f1012" stroke="#fdfdfd" stroke-width="1.5"/>
-                  <text x="342" y="369" fill="#0f1012" font-size="11" font-weight="300">Vitoria-Gasteiz</text>
+                  <circle cx="330" cy="365" r="5" class="pin" fill="#0f1012" stroke="#ffffff" stroke-width="1.5"/>
+                  <text x="342" y="369" fill="#0f1012" font-size="11" font-weight="400">Vitoria-Gasteiz (780 €)</text>
                 </g>
                 <g class="muni-node" id="node-Agurain" onclick="selectMunicipality('Agurain')">
-                  <circle cx="440" cy="355" r="3.5" class="pin" fill="#5e5e5e"/>
-                  <text x="448" y="358" fill="#5e5e5e" font-size="10" font-weight="300">Agurain</text>
+                  <circle cx="440" cy="355" r="4" class="pin" fill="#5e5e5e"/>
+                  <text x="448" y="358" fill="#5e5e5e" font-size="10">Agurain (620 €)</text>
                 </g>
               </svg>
             </div>
 
             <!-- Leyenda de simbología -->
-            <div class="flex flex-wrap items-center justify-between text-[11px] text-[#5e5e5e] px-2">
+            <div class="flex flex-wrap items-center justify-between text-[11px] text-[#5e5e5e] pt-1">
               <div class="flex items-center gap-4">
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#0f1012]"></span> Capital</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#0071e3]"></span> Promoción VPO</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#5e5e5e]"></span> Municipio Cabecera</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#0071e3]"></span> Capital / Principal</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#e02424]"></span> Mercado Tensionado</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#0f1012]"></span> Cabecera Comarcal</span>
               </div>
-              <span class="text-[#8f8f8f]">Haz clic sobre cualquier municipio para inspeccionarlo</span>
+              <span class="text-[#8f8f8f]">Haz clic en cualquier badge para inspeccionar el municipio</span>
             </div>
           </div>
 
@@ -428,35 +503,36 @@
           <div class="lg:col-span-4 space-y-6">
             <div class="space-y-1">
               <div class="augen-caption" id="muni-territory-tag">TERRITORIO: BIZKAIA</div>
-              <h3 id="muni-name-header" class="text-[22px] font-light text-[#0f1012]">Bilbao</h3>
+              <h3 id="muni-name-header" class="text-[24px] font-light text-[#0f1012]">Bilbao</h3>
               <p id="muni-desc-text" class="text-[12px] text-[#5e5e5e] leading-relaxed">Capital vizcaína, mayor concentración de solicitudes en Etxebide y parque de alquiler.</p>
             </div>
 
             <!-- Métricas Específicas del Municipio -->
-            <div class="space-y-3 pt-2">
-              <div class="p-4 rounded-[18px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
+            <div class="space-y-2.5 pt-1">
+              <div class="p-3.5 rounded-[16px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
                 <span class="text-[12px] text-[#5e5e5e]">Alquiler Medio Estimado:</span>
-                <span id="muni-rent-val" class="text-[16px] font-light text-[#0f1012]">950 € / mes</span>
+                <span id="muni-rent-val" class="text-[15px] font-normal text-[#0f1012]">950 € / mes</span>
               </div>
 
-              <div class="p-4 rounded-[18px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
+              <div class="p-3.5 rounded-[16px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
                 <span class="text-[12px] text-[#5e5e5e]">Renta Media Disponible:</span>
-                <span id="muni-income-val" class="text-[16px] font-light text-[#0f1012]">25.800 € / año</span>
+                <span id="muni-income-val" class="text-[15px] font-normal text-[#0f1012]">25.800 € / año</span>
               </div>
 
-              <div class="p-4 rounded-[18px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
+              <div class="p-3.5 rounded-[16px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
                 <span class="text-[12px] text-[#5e5e5e]">Promociones Visesa:</span>
-                <span id="muni-visesa-val" class="text-[15px] font-light text-[#0071e3]">113 viv. (Zorrotzaurre)</span>
+                <span id="muni-visesa-val" class="text-[14px] font-normal text-[#0071e3]">113 viv. (Zorrotzaurre)</span>
               </div>
 
-              <div class="p-4 rounded-[18px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
-                <span class="text-[12px] text-[#5e5e5e]">Tasa de Esfuerzo Neto:</span>
-                <span id="muni-effort-val" class="text-[16px] font-light text-[#0f1012]">67.4% &rarr; 46.1%</span>
+              <div class="p-3.5 rounded-[16px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
+                <span class="text-[12px] text-[#5e5e5e]">Esfuerzo Bruto vs Neto:</span>
+                <span id="muni-effort-val" class="text-[14px] font-normal text-[#0f1012]">67.4% &rarr; 46.1%</span>
               </div>
             </div>
 
-            <button onclick="applyMuniToSimulator()" class="w-full py-2.5 rounded-[26px] border border-black/[0.10] text-[12px] text-[#0f1012] hover:border-[#0071e3] hover:text-[#0071e3] transition-all">
-              Cargar datos en el Simulador &rarr;
+            <button onclick="applyMuniToSimulator()" class="w-full py-2.5 rounded-[26px] border border-black/[0.12] text-[12px] text-[#0f1012] hover:border-[#0071e3] hover:text-[#0071e3] transition-all flex items-center justify-center gap-2">
+              <span>Cargar datos en el Simulador</span>
+              <span>&rarr;</span>
             </button>
           </div>
 
@@ -471,7 +547,7 @@
         <h2 class="augen-heading">Simulador de Esfuerzo Juvenil y Gaztelagun</h2>
       </div>
 
-      <div class="augen-card space-y-12">
+      <div class="augen-card space-y-10">
         
         <!-- Selector de Presets Territoriales -->
         <div class="flex flex-wrap items-center justify-between gap-4 border-b border-black/[0.06] pb-6">
@@ -735,24 +811,43 @@
   </footer>
 
   <script>
-    // Base de datos de 16 municipios de Euskadi con geolocalización real
+    // Base de datos de 16 municipios de Euskadi con geolocalización exacta y datos socioeconómicos
     const municipalDB = {
-      "Bilbao": { name: "Bilbao", terr: "Bizkaia", lat: 43.2630, lng: -2.9350, salary: 1410.0, avgRent: 950, income: "25.800 €", visesa: "113 viv. (Zorrotzaurre)", desc: "Capital vizcaína, mayor concentración de solicitudes en Etxebide y parque de alquiler.", isTension: true },
-      "Donostia": { name: "Donostia / San Sebastián", terr: "Gipuzkoa", lat: 43.3183, lng: -1.9812, salary: 1445.0, avgRent: 1250, income: "29.500 €", visesa: "52 viv. (Txomin Enea)", desc: "Municipio con mayor tensión de precios de alquiler y compraventa de toda Euskadi.", isTension: true },
-      "Vitoria": { name: "Vitoria-Gasteiz", terr: "Araba", lat: 42.8467, lng: -2.6716, salary: 1405.0, avgRent: 780, income: "21.000 €", visesa: "162 viv. (Salburua)", desc: "Mayor suelo residencial protegido disponible y cuotas más contenidas para jóvenes.", isTension: false },
-      "Getxo": { name: "Getxo", terr: "Bizkaia", lat: 43.3556, lng: -3.0119, salary: 1410.0, avgRent: 1150, income: "32.100 €", visesa: "34 viv. (Iturribarren)", desc: "Alta renta disponible y presión habitacional en el eje metropolitano de la ría.", isTension: true },
-      "Barakaldo": { name: "Barakaldo", terr: "Bizkaia", lat: 43.2973, lng: -2.9868, salary: 1410.0, avgRent: 840, income: "22.400 €", visesa: "48 viv. (Lutxana)", desc: "Ciudad industrial en transición, alternativa accesible al alquiler en Bilbao centro.", isTension: false },
-      "Portugalete": { name: "Portugalete", terr: "Bizkaia", lat: 43.3206, lng: -3.0195, salary: 1410.0, avgRent: 820, income: "23.000 €", visesa: "25 viv.", desc: "Alta densidad residencial con buena conectividad por metro.", isTension: false },
-      "Durango": { name: "Durango", terr: "Bizkaia", lat: 43.1685, lng: -2.6315, salary: 1410.0, avgRent: 800, income: "24.500 €", visesa: "30 viv.", desc: "Comarca de Durangaldea con equilibrio relativo de oferta.", isTension: false },
-      "Gernika": { name: "Gernika-Lumo", terr: "Bizkaia", lat: 43.3155, lng: -2.6793, salary: 1410.0, avgRent: 740, income: "23.800 €", visesa: "18 viv.", desc: "Reserva de Urdaibai, parque residencial tradicional y estable.", isTension: false },
-      "Zarautz": { name: "Zarautz", terr: "Gipuzkoa", lat: 43.2842, lng: -2.1706, salary: 1445.0, avgRent: 1050, income: "27.300 €", visesa: "24 viv. (Irita)", desc: "Fuerte tensión de alquiler vacacional y estacional en costa gipuzkoana.", isTension: true },
-      "Irun": { name: "Irun", terr: "Gipuzkoa", lat: 43.3390, lng: -1.7894, salary: 1445.0, avgRent: 860, income: "23.100 €", visesa: "42 viv. (Oinaurre)", desc: "Nodo fronterizo con demanda activa de alquiler protegido.", isTension: false },
-      "Eibar": { name: "Eibar", terr: "Gipuzkoa", lat: 43.1844, lng: -2.4736, salary: 1445.0, avgRent: 690, income: "22.000 €", visesa: "26 viv.", desc: "Precios de alquiler moderados en el valle del Deba.", isTension: false },
-      "Arrasate": { name: "Arrasate / Mondragón", terr: "Gipuzkoa", lat: 43.0658, lng: -2.4902, salary: 1445.0, avgRent: 720, income: "26.100 €", visesa: "35 viv.", desc: "Fuerte arraigo cooperativo industrial y demanda universitaria.", isTension: false },
-      "Tolosa": { name: "Tolosa", terr: "Gipuzkoa", lat: 43.1367, lng: -2.0744, salary: 1445.0, avgRent: 730, income: "24.200 €", visesa: "20 viv.", desc: "Comarca de Tolosaldea, mercado residencial de media escala.", isTension: false },
-      "Laudio": { name: "Laudio / Llodio", terr: "Araba", lat: 43.1436, lng: -3.0809, salary: 1405.0, avgRent: 680, income: "23.400 €", visesa: "20 viv.", desc: "Valle de Ayala, conexión directa con el área metropolitana de Bilbao.", isTension: false },
-      "Agurain": { name: "Agurain / Salvatierra", terr: "Araba", lat: 42.8517, lng: -2.3892, salary: 1405.0, avgRent: 620, income: "20.500 €", visesa: "56 viv. (Harresi)", desc: "Llanada Alavesa, promociones activas de Visesa en régimen de alquiler.", isTension: false },
-      "Laguardia": { name: "Laguardia", terr: "Araba", lat: 42.5539, lng: -2.5847, salary: 1405.0, avgRent: 580, income: "19.800 €", visesa: "12 viv.", desc: "Rioja Alavesa, menor presión de alquiler pero reto demográfico juvenil.", isTension: false }
+      "Bilbao": { name: "Bilbao", terr: "Bizkaia", lat: 43.2630, lng: -2.9350, salary: 1410.0, avgRent: 950, income: "25.800 €", visesa: "113 viv. (Zorrotzaurre)", desc: "Capital vizcaína, mayor concentración de solicitudes en Etxebide y parque de alquiler.", isCapital: true, isTension: true },
+      "Donostia": { name: "Donostia", terr: "Gipuzkoa", lat: 43.3183, lng: -1.9812, salary: 1445.0, avgRent: 1250, income: "29.500 €", visesa: "52 viv. (Txomin Enea)", desc: "Municipio con mayor tensión de precios de alquiler y compraventa de toda Euskadi.", isCapital: true, isTension: true },
+      "Vitoria": { name: "Vitoria-Gasteiz", terr: "Araba", lat: 42.8467, lng: -2.6716, salary: 1405.0, avgRent: 780, income: "21.000 €", visesa: "162 viv. (Salburua)", desc: "Mayor suelo residencial protegido disponible y cuotas más contenidas para jóvenes.", isCapital: true, isTension: false },
+      "Getxo": { name: "Getxo", terr: "Bizkaia", lat: 43.3556, lng: -3.0119, salary: 1410.0, avgRent: 1150, income: "32.100 €", visesa: "34 viv. (Iturribarren)", desc: "Alta renta disponible y fuerte presión habitacional en la margen derecha.", isCapital: false, isTension: true },
+      "Barakaldo": { name: "Barakaldo", terr: "Bizkaia", lat: 43.2973, lng: -2.9868, salary: 1410.0, avgRent: 840, income: "22.400 €", visesa: "48 viv. (Lutxana)", desc: "Ciudad industrial en transición, alternativa directa al alquiler en Bilbao centro.", isCapital: false, isTension: false },
+      "Portugalete": { name: "Portugalete", terr: "Bizkaia", lat: 43.3206, lng: -3.0195, salary: 1410.0, avgRent: 820, income: "23.000 €", visesa: "25 viv.", desc: "Alta densidad residencial con excelente conectividad de transporte público.", isCapital: false, isTension: false },
+      "Durango": { name: "Durango", terr: "Bizkaia", lat: 43.1685, lng: -2.6315, salary: 1410.0, avgRent: 800, income: "24.500 €", visesa: "30 viv.", desc: "Cabecera de Durangaldea con equilibrio de oferta residencial.", isCapital: false, isTension: false },
+      "Gernika": { name: "Gernika", terr: "Bizkaia", lat: 43.3155, lng: -2.6793, salary: 1410.0, avgRent: 740, income: "23.800 €", visesa: "18 viv.", desc: "Reserva de Urdaibai, parque residencial tradicional y estable.", isCapital: false, isTension: false },
+      "Zarautz": { name: "Zarautz", terr: "Gipuzkoa", lat: 43.2842, lng: -2.1706, salary: 1445.0, avgRent: 1050, income: "27.300 €", visesa: "24 viv. (Irita)", desc: "Fuerte tensión de alquiler vacacional y estacional en costa gipuzkoana.", isCapital: false, isTension: true },
+      "Irun": { name: "Irun", terr: "Gipuzkoa", lat: 43.3390, lng: -1.7894, salary: 1445.0, avgRent: 860, income: "23.100 €", visesa: "42 viv. (Oinaurre)", desc: "Comarca de Txingudi, nodo fronterizo con demanda activa de alquiler protegido.", isCapital: false, isTension: false },
+      "Eibar": { name: "Eibar", terr: "Gipuzkoa", lat: 43.1844, lng: -2.4736, salary: 1445.0, avgRent: 690, income: "22.000 €", visesa: "26 viv.", desc: "Precios de alquiler moderados en la cuenca del Deba.", isCapital: false, isTension: false },
+      "Arrasate": { name: "Arrasate", terr: "Gipuzkoa", lat: 43.0658, lng: -2.4902, salary: 1445.0, avgRent: 720, income: "26.100 €", visesa: "35 viv.", desc: "Fuerte tejido cooperativo industrial y demanda universitaria activa.", isCapital: false, isTension: false },
+      "Tolosa": { name: "Tolosa", terr: "Gipuzkoa", lat: 43.1367, lng: -2.0744, salary: 1445.0, avgRent: 730, income: "24.200 €", visesa: "20 viv.", desc: "Cabecera de Tolosaldea, mercado residencial de media escala.", isCapital: false, isTension: false },
+      "Laudio": { name: "Laudio", terr: "Araba", lat: 43.1436, lng: -3.0809, salary: 1405.0, avgRent: 680, income: "23.400 €", visesa: "20 viv.", desc: "Valle de Ayala, conexión directa de cercanías con Bilbao.", isCapital: false, isTension: false },
+      "Agurain": { name: "Agurain", terr: "Araba", lat: 42.8517, lng: -2.3892, salary: 1405.0, avgRent: 620, income: "20.500 €", visesa: "56 viv. (Harresi)", desc: "Llanada Alavesa, promociones activas de Visesa en régimen de alquiler.", isCapital: false, isTension: false },
+      "Laguardia": { name: "Laguardia", terr: "Araba", lat: 42.5539, lng: -2.5847, salary: 1405.0, avgRent: 580, income: "19.800 €", visesa: "12 viv.", desc: "Rioja Alavesa, menor presión de precios pero reto demográfico juvenil.", isCapital: false, isTension: false }
+    };
+
+    // Polígonos provinciales simplificados de Euskadi
+    const provincesPolygons = {
+      "Bizkaia": [
+        [43.36, -3.42], [43.46, -3.12], [43.44, -2.70], [43.34, -2.42],
+        [43.20, -2.47], [43.08, -2.62], [43.04, -2.85], [43.08, -3.08],
+        [43.24, -3.45], [43.36, -3.42]
+      ],
+      "Gipuzkoa": [
+        [43.34, -2.42], [43.31, -2.02], [43.37, -1.78], [43.26, -1.75],
+        [43.10, -1.90], [42.94, -2.25], [43.01, -2.50], [43.20, -2.47],
+        [43.34, -2.42]
+      ],
+      "Araba": [
+        [43.08, -2.62], [43.01, -2.50], [42.94, -2.25], [42.74, -2.27],
+        [42.55, -2.45], [42.50, -2.60], [42.58, -2.82], [42.80, -3.10],
+        [43.08, -3.08], [43.04, -2.85], [43.08, -2.62]
+      ]
     };
 
     const listings = [
@@ -768,78 +863,160 @@
     let currentSalary = 1410.0;
     let gaztelagunActive = true;
     let leafletMap = null;
-    let mapMarkers = [];
+    let leafletMarkersLayer = null;
+    let leafletProvincesLayer = null;
+    let currentActiveFilter = "all";
 
     // INICIALIZACIÓN DEL MAPA LEAFLET QUIRÚRGICO (Augen Pro)
     function initLeafletMap() {
       const container = document.getElementById("map-container");
       if (!container) return;
 
-      // Centro geográfico de Euskadi
+      // Crear mapa centrado y encuadrado en las dimensiones de Euskadi
       leafletMap = L.map("map-container", {
-        center: [43.12, -2.55],
-        zoom: 9,
         zoomControl: true,
-        attributionControl: false
+        attributionControl: false,
+        minZoom: 8,
+        maxZoom: 15
       });
 
-      // Capa de teselas CartoDB Positron: quirúrgica, monocromática y limpia
+      // Teselas CartoDB Positron: Estética monocromática limpia y contrastada
       L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
         maxZoom: 18,
         subdomains: "abcd"
       }).addTo(leafletMap);
 
-      renderMapMarkers("all");
+      // Dibujar polígonos provinciales sutiles
+      leafletProvincesLayer = L.layerGroup().addTo(leafletMap);
+      Object.keys(provincesPolygons).forEach(terr => {
+        const poly = L.polygon(provincesPolygons[terr], {
+          color: "#0f1012",
+          weight: 0.75,
+          opacity: 0.35,
+          fillColor: "#0071e3",
+          fillOpacity: 0.02,
+          dashArray: "3, 3"
+        });
+
+        poly.on("mouseover", () => {
+          poly.setStyle({ color: "#0071e3", weight: 1.5, fillOpacity: 0.06, dashArray: "" });
+        });
+        poly.on("mouseout", () => {
+          poly.setStyle({ color: "#0f1012", weight: 0.75, fillOpacity: 0.02, dashArray: "3, 3" });
+        });
+        poly.on("click", () => {
+          zoomTerritory(terr);
+        });
+
+        leafletProvincesLayer.addLayer(poly);
+      });
+
+      leafletMarkersLayer = L.layerGroup().addTo(leafletMap);
+
+      // Encuadre inicial perfecto para todo Euskadi
+      leafletMap.fitBounds([
+        [42.48, -3.35], // Suroeste (Laguardia / Enkarterri)
+        [43.48, -1.72]  // Noreste (Hondarribia / Donostia)
+      ], { padding: [25, 25] });
+
+      renderMapMarkers(currentActiveFilter);
+
+      // Solución para asegurar cálculo correcto del viewport tras renderizar fuentes
+      setTimeout(() => {
+        if (leafletMap) leafletMap.invalidateSize();
+      }, 250);
     }
 
+    // Renderizar Badges Inmobiliarias usando L.divIcon
     function renderMapMarkers(filter) {
-      if (!leafletMap) return;
+      if (!leafletMap || !leafletMarkersLayer) return;
 
-      // Limpiar marcadores previos
-      mapMarkers.forEach(m => leafletMap.removeLayer(m));
-      mapMarkers = [];
+      leafletMarkersLayer.clearLayers();
+      let count = 0;
 
       Object.keys(municipalDB).forEach(key => {
         const item = municipalDB[key];
 
-        // Aplicar filtros
+        // Aplicar filtros funcionales
         if (filter === "visesa" && !item.visesa.includes("viv.")) return;
-        if (filter === "libre" && item.isTension === false && item.avgRent < 800) return;
         if (filter === "tension" && !item.isTension) return;
 
+        count++;
         const isSelected = (key === currentSelectedMuni);
-        const isCapital = ["Bilbao", "Donostia", "Vitoria"].includes(key);
+        const capitalClass = item.isCapital ? "is-capital" : "";
+        const tensionClass = item.isTension ? "is-tension" : "";
+        const selectedClass = isSelected ? "selected" : "";
 
-        const circle = L.circleMarker([item.lat, item.lng], {
-          radius: isSelected ? 8 : (isCapital ? 6 : 4.5),
-          fillColor: isSelected ? "#0071e3" : (isCapital ? "#0f1012" : "#5e5e5e"),
-          color: isSelected ? "#0071e3" : "#ffffff",
-          weight: isSelected ? 2.5 : 1.5,
-          opacity: 1,
-          fillOpacity: 0.95
-        }).addTo(leafletMap);
-
-        // Tooltip limpio estilo Augen
-        circle.bindTooltip(`
-          <div style="font-size: 11px; font-weight: 300;">
-            <strong style="font-weight: 400; color: #0f1012;">${item.name}</strong><br/>
-            Alquiler: <span style="color: #0071e3;">${item.avgRent} €/m</span>
+        // HTML del Pill Badge Augen Pro
+        const badgeHtml = `
+          <div class="muni-badge ${capitalClass} ${tensionClass} ${selectedClass}" id="badge-${key}">
+            <span class="dot"></span>
+            <span class="name">${item.name}</span>
+            <span class="price">${item.avgRent}€</span>
           </div>
-        `, { direction: "top", offset: [0, -6] });
+        `;
 
-        circle.on("click", () => {
+        const icon = L.divIcon({
+          className: "muni-badge-wrapper",
+          html: badgeHtml,
+          iconSize: [110, 26],
+          iconAnchor: [55, 13]
+        });
+
+        const marker = L.marker([item.lat, item.lng], {
+          icon: icon,
+          zIndexOffset: isSelected ? 1000 : (item.isCapital ? 500 : 100)
+        });
+
+        marker.on("click", () => {
           selectMunicipality(key);
         });
 
-        mapMarkers.push(circle);
+        leafletMarkersLayer.addLayer(marker);
       });
+
+      document.getElementById("map-status-pill").innerText = `${count} municipios mostrados`;
     }
 
     function setMapFilter(flt) {
+      currentActiveFilter = flt;
       document.querySelectorAll("[id^='btn-flt-']").forEach(b => b.classList.add("inactive"));
       const activeBtn = document.getElementById(`btn-flt-${flt}`);
       if (activeBtn) activeBtn.classList.remove("inactive");
       renderMapMarkers(flt);
+    }
+
+    function zoomTerritory(terr) {
+      document.querySelectorAll("[id^='btn-zoom-']").forEach(b => b.classList.add("inactive"));
+      const btn = document.getElementById(`btn-zoom-${terr}`);
+      if (btn) btn.classList.remove("inactive");
+
+      if (!leafletMap) return;
+
+      if (terr === "all") {
+        leafletMap.fitBounds([
+          [42.48, -3.35],
+          [43.48, -1.72]
+        ], { padding: [25, 25], animate: true, duration: 0.6 });
+      } else if (terr === "Bizkaia") {
+        leafletMap.fitBounds([
+          [43.05, -3.40],
+          [43.45, -2.45]
+        ], { padding: [20, 20], animate: true, duration: 0.6 });
+        selectMunicipality("Bilbao");
+      } else if (terr === "Gipuzkoa") {
+        leafletMap.fitBounds([
+          [42.95, -2.50],
+          [43.40, -1.75]
+        ], { padding: [20, 20], animate: true, duration: 0.6 });
+        selectMunicipality("Donostia");
+      } else if (terr === "Araba") {
+        leafletMap.fitBounds([
+          [42.50, -3.10],
+          [43.10, -2.30]
+        ], { padding: [20, 20], animate: true, duration: 0.6 });
+        selectMunicipality("Vitoria");
+      }
     }
 
     function toggleMapMode(mode) {
@@ -853,7 +1030,9 @@
         wrapS.classList.add("hidden");
         btnL.classList.remove("inactive");
         btnS.classList.add("inactive");
-        if (leafletMap) leafletMap.invalidateSize();
+        setTimeout(() => {
+          if (leafletMap) leafletMap.invalidateSize();
+        }, 100);
       } else {
         wrapL.classList.add("hidden");
         wrapS.classList.remove("hidden");
@@ -880,7 +1059,7 @@
       const netEffort = (netRent / data.salary) * 100.0;
       document.getElementById("muni-effort-val").innerText = `${rawEffort.toFixed(1)}% → ${netEffort.toFixed(1)}%`;
 
-      // Actualizar nodos SVG si están activos
+      // Actualizar SVG
       document.querySelectorAll(".muni-node").forEach(n => n.classList.remove("selected"));
       const nodeEl = document.getElementById(`node-${key}`);
       if (nodeEl) nodeEl.classList.add("selected");
@@ -892,10 +1071,14 @@
       const svgLabel = document.getElementById("svg-active-label");
       if (svgLabel) svgLabel.innerText = `${data.name} (${data.terr})`;
 
-      // Centrar suavemente en Leaflet si existe
+      // Actualizar Badges en Leaflet
+      document.querySelectorAll(".muni-badge").forEach(b => b.classList.remove("selected"));
+      const badgeEl = document.getElementById(`badge-${key}`);
+      if (badgeEl) badgeEl.classList.add("selected");
+
+      // Centrar suavemente en el mapa Leaflet
       if (leafletMap) {
-        leafletMap.panTo([data.lat, data.lng], { animate: true, duration: 0.5 });
-        renderMapMarkers("all");
+        leafletMap.panTo([data.lat, data.lng], { animate: true, duration: 0.4 });
       }
     }
 
@@ -1033,6 +1216,10 @@
       runSim();
       runComparison();
       renderTable();
+    });
+
+    window.addEventListener("resize", () => {
+      if (leafletMap) leafletMap.invalidateSize();
     });
   </script>
 </body>
