@@ -145,7 +145,6 @@
 
     /* ==========================================================================
        FIX CRÍTICO DE COMPATIBILIDAD LEAFLET + TAILWIND CSS
-       Evita que el CSS reset de Tailwind rompa las teselas de Leaflet
        ========================================================================== */
     .leaflet-container img {
       max-width: none !important;
@@ -237,7 +236,27 @@
       letter-spacing: -0.2px;
     }
 
-    /* Controles de Zoom Leaflet Augen */
+    /* Popup Leaflet Minimalista con Foto */
+    .leaflet-popup-content-wrapper {
+      background-color: #fdfdfd !important;
+      border-radius: 18px !important;
+      border: 0.5px solid rgba(0, 0, 0, 0.12) !important;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
+
+    .leaflet-popup-content {
+      margin: 0 !important;
+      line-height: 1.2 !important;
+    }
+
+    .leaflet-popup-tip {
+      background-color: #fdfdfd !important;
+      box-shadow: none !important;
+    }
+
+    /* Zoom Leaflet */
     .leaflet-control-zoom {
       border: 0.5px solid rgba(0, 0, 0, 0.10) !important;
       border-radius: 12px !important;
@@ -276,6 +295,37 @@
       fill: var(--color-signal-blue);
       stroke: #ffffff;
       stroke-width: 2px;
+    }
+
+    /* Foto de la Vivienda y Animaciones */
+    .housing-img-container {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 0.5px solid rgba(0, 0, 0, 0.08);
+      background-color: #f2f2f4;
+    }
+
+    .housing-img-container img {
+      transition: transform 0.3s ease;
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .housing-img-container:hover img {
+      transform: scale(1.03);
+    }
+
+    /* Modal Lightbox */
+    #lightbox-modal {
+      display: none;
+      backdrop-filter: blur(8px);
+      background-color: rgba(15, 16, 18, 0.75);
+    }
+
+    #lightbox-modal.active {
+      display: flex;
     }
 
     /* Estilos de Impresión */
@@ -365,12 +415,12 @@
       </div>
     </section>
 
-    <!-- SECCIÓN 1: CARTOGRAFÍA GEOESPACIAL INTERACTIVA DE EUSKADI -->
+    <!-- SECCIÓN 1: CARTOGRAFÍA GEOESPACIAL INTERACTIVA CON FOTOGRAFÍA -->
     <section id="cartografia" class="space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
         <div class="space-y-1">
-          <div class="augen-caption">CARTOGRAFÍA / DISTRIBUCIÓN TERRITORIAL Y PRECIOS</div>
-          <h2 class="augen-heading">Geografía Residencial de Euskadi</h2>
+          <div class="augen-caption">CARTOGRAFÍA / DISTRIBUCIÓN TERRITORIAL Y FOTOGRAFÍA DE INMUEBLES</div>
+          <h2 class="augen-heading">Geografía y Catálogo Visual de Viviendas</h2>
         </div>
 
         <!-- Selector de Capas / Filtros -->
@@ -394,7 +444,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-black/[0.06] pb-4 text-[12px]">
           <div class="text-[#5e5e5e] flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-[#0071e3]"></span>
-            <span>Enfoque territorial:</span>
+            <span>Haz clic en un municipio para desplegar la foto y ficha de su vivienda:</span>
           </div>
           <div class="flex flex-wrap gap-2">
             <button onclick="zoomTerritory('all')" class="augen-tag !py-1 !text-[11px]" id="btn-zoom-all">Todo Euskadi</button>
@@ -406,8 +456,8 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          <!-- Lienzo Cartográfico (8 cols) -->
-          <div class="lg:col-span-8 space-y-3">
+          <!-- Lienzo Cartográfico (7 cols) -->
+          <div class="lg:col-span-7 space-y-3">
             
             <!-- Contenedor Leaflet Positron -->
             <div id="wrapper-leaflet" class="relative">
@@ -416,7 +466,7 @@
               <!-- Badge indicador superior derecho -->
               <div class="absolute top-3 right-3 z-[400] bg-white/95 backdrop-blur-sm border border-black/[0.08] rounded-[10px] px-3 py-1.5 text-[11px] text-[#5e5e5e] flex items-center gap-2">
                 <span class="inline-block w-2 h-2 rounded-full bg-[#0071e3]"></span>
-                <span id="map-status-pill">16 municipios cargados</span>
+                <span id="map-status-pill">16 municipios activos</span>
               </div>
             </div>
 
@@ -495,45 +545,74 @@
                 <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#e02424]"></span> Mercado Tensionado</span>
                 <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#0f1012]"></span> Cabecera Comarcal</span>
               </div>
-              <span class="text-[#8f8f8f]">Haz clic en cualquier badge para inspeccionar el municipio</span>
+              <span class="text-[#8f8f8f]">Haz clic en la foto de la vivienda para ampliarla</span>
             </div>
           </div>
 
-          <!-- Panel Lateral: Ficha Territorial Detallada (4 cols) -->
-          <div class="lg:col-span-4 space-y-6">
+          <!-- Panel Lateral: Ficha con Fotografía de la Vivienda (5 cols) -->
+          <div class="lg:col-span-5 space-y-4">
+            
+            <!-- Fotografía de la Vivienda / Promoción -->
+            <div class="housing-img-container cursor-pointer group" onclick="openLightbox()" title="Clic para ampliar fotografía">
+              <img id="muni-photo-img" src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80" alt="Fotografía de la Vivienda">
+              
+              <!-- Badges superpuestas en la foto -->
+              <div class="absolute top-3 left-3 flex gap-2">
+                <span id="muni-photo-badge" class="bg-black/60 backdrop-blur-md text-white border border-white/20 text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-[9999px]">
+                  VPO Alquiler
+                </span>
+                <span id="muni-zone-badge" class="bg-black/60 backdrop-blur-md text-white border border-white/20 text-[10px] px-2.5 py-0.5 rounded-[9999px]">
+                  Zorrotzaurre
+                </span>
+              </div>
+
+              <!-- Icono de Zoom -->
+              <div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md text-white rounded-full w-7 h-7 flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
+                <span class="text-xs">⤢</span>
+              </div>
+            </div>
+
+            <!-- Datos Descriptivos -->
             <div class="space-y-1">
-              <div class="augen-caption" id="muni-territory-tag">TERRITORIO: BIZKAIA</div>
-              <h3 id="muni-name-header" class="text-[24px] font-light text-[#0f1012]">Bilbao</h3>
-              <p id="muni-desc-text" class="text-[12px] text-[#5e5e5e] leading-relaxed">Capital vizcaína, mayor concentración de solicitudes en Etxebide y parque de alquiler.</p>
+              <div class="flex items-center justify-between">
+                <span class="augen-caption" id="muni-territory-tag">TERRITORIO: BIZKAIA</span>
+                <span class="text-[11px] font-mono text-[#0071e3]" id="muni-ref-code">Ref: VISESA-9799</span>
+              </div>
+              <h3 id="muni-name-header" class="text-[22px] font-light text-[#0f1012]">Bilbao • Zorrotzaurre 113</h3>
+              <p id="muni-desc-text" class="text-[12px] text-[#5e5e5e] leading-relaxed">
+                113 babes ofizialeko etxebizitzak alokairuan Zorrotzaurren. Edificio bioclimático de alta eficiencia energética.
+              </p>
             </div>
 
             <!-- Métricas Específicas del Municipio -->
-            <div class="space-y-2.5 pt-1">
-              <div class="p-3.5 rounded-[16px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
-                <span class="text-[12px] text-[#5e5e5e]">Alquiler Medio Estimado:</span>
-                <span id="muni-rent-val" class="text-[15px] font-normal text-[#0f1012]">950 € / mes</span>
+            <div class="space-y-2 pt-1 text-[13px]">
+              <div class="p-3 rounded-[14px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
+                <span class="text-[#5e5e5e]">Alquiler Medio Estimado:</span>
+                <span id="muni-rent-val" class="font-normal text-[#0f1012]">950 € / mes</span>
               </div>
 
-              <div class="p-3.5 rounded-[16px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
-                <span class="text-[12px] text-[#5e5e5e]">Renta Media Disponible:</span>
-                <span id="muni-income-val" class="text-[15px] font-normal text-[#0f1012]">25.800 € / año</span>
+              <div class="p-3 rounded-[14px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
+                <span class="text-[#5e5e5e]">Renta Media Disponible:</span>
+                <span id="muni-income-val" class="font-normal text-[#0f1012]">25.800 € / año</span>
               </div>
 
-              <div class="p-3.5 rounded-[16px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
-                <span class="text-[12px] text-[#5e5e5e]">Promociones Visesa:</span>
-                <span id="muni-visesa-val" class="text-[14px] font-normal text-[#0071e3]">113 viv. (Zorrotzaurre)</span>
-              </div>
-
-              <div class="p-3.5 rounded-[16px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
-                <span class="text-[12px] text-[#5e5e5e]">Esfuerzo Bruto vs Neto:</span>
-                <span id="muni-effort-val" class="text-[14px] font-normal text-[#0f1012]">67.4% &rarr; 46.1%</span>
+              <div class="p-3 rounded-[14px] bg-[#f2f2f4]/60 border border-black/[0.04] flex justify-between items-center">
+                <span class="text-[#5e5e5e]">Tasa de Esfuerzo (Bruto &rarr; Gaztelagun):</span>
+                <span id="muni-effort-val" class="font-normal text-[#0f1012]">67.4% &rarr; 46.1%</span>
               </div>
             </div>
 
-            <button onclick="applyMuniToSimulator()" class="w-full py-2.5 rounded-[26px] border border-black/[0.12] text-[12px] text-[#0f1012] hover:border-[#0071e3] hover:text-[#0071e3] transition-all flex items-center justify-center gap-2">
-              <span>Cargar datos en el Simulador</span>
-              <span>&rarr;</span>
-            </button>
+            <!-- Botones de Acción -->
+            <div class="grid grid-cols-2 gap-3 pt-1">
+              <button onclick="applyMuniToSimulator()" class="w-full py-2.5 rounded-[26px] border border-black/[0.12] text-[12px] text-[#0f1012] hover:border-[#0071e3] hover:text-[#0071e3] transition-all flex items-center justify-center gap-1.5">
+                <span>Simulador</span>
+                <span>&rarr;</span>
+              </button>
+              <a id="muni-dossier-link" href="https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9799" target="_blank" class="w-full py-2.5 rounded-[26px] border border-black/[0.12] text-[12px] text-center text-[#5e5e5e] hover:border-[#0071e3] hover:text-[#0071e3] transition-all">
+                Ficha Oficial &rarr;
+              </a>
+            </div>
+
           </div>
 
         </div>
@@ -796,6 +875,28 @@
 
   </main>
 
+  <!-- MODAL LIGHTBOX DE FOTOGRAFÍA EN ALTA RESOLUCIÓN -->
+  <div id="lightbox-modal" class="fixed inset-0 z-[999] items-center justify-center p-4" onclick="closeLightbox()">
+    <div class="bg-[#fdfdfd] rounded-[32px] max-w-2xl w-full p-6 space-y-4 border border-black/[0.12] relative" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between pb-2 border-b border-black/[0.06]">
+        <div>
+          <div class="augen-caption" id="modal-tag">VIVIENDA SELECCIONADA</div>
+          <h4 id="modal-title" class="text-[18px] font-light text-[#0f1012]">Promoción Visesa</h4>
+        </div>
+        <button onclick="closeLightbox()" class="w-8 h-8 rounded-full border border-black/[0.10] flex items-center justify-center text-sm hover:border-[#0071e3] transition-colors">
+          ✕
+        </button>
+      </div>
+      <div class="rounded-[20px] overflow-hidden border border-black/[0.06] bg-[#f2f2f4]">
+        <img id="modal-img" src="" alt="Vivienda en alta resolución" class="w-full max-h-[420px] object-cover">
+      </div>
+      <div class="flex justify-between items-center text-[12px] text-[#5e5e5e]">
+        <span id="modal-desc">Promoción oficial de vivienda en Euskadi.</span>
+        <span id="modal-price" class="text-[15px] font-normal text-[#0071e3]">950 € / mes</span>
+      </div>
+    </div>
+  </div>
+
   <!-- DARK BAND FOOTER -->
   <footer class="mt-[94px] bg-[#0f1012] text-white pt-[50px] pb-[69px] px-6">
     <div class="max-w-[1200px] mx-auto text-center space-y-4">
@@ -811,24 +912,152 @@
   </footer>
 
   <script>
-    // Base de datos de 16 municipios de Euskadi con geolocalización exacta y datos socioeconómicos
+    // Base de datos de 16 municipios de Euskadi con fotografías reales de arquitectura y viviendas
     const municipalDB = {
-      "Bilbao": { name: "Bilbao", terr: "Bizkaia", lat: 43.2630, lng: -2.9350, salary: 1410.0, avgRent: 950, income: "25.800 €", visesa: "113 viv. (Zorrotzaurre)", desc: "Capital vizcaína, mayor concentración de solicitudes en Etxebide y parque de alquiler.", isCapital: true, isTension: true },
-      "Donostia": { name: "Donostia", terr: "Gipuzkoa", lat: 43.3183, lng: -1.9812, salary: 1445.0, avgRent: 1250, income: "29.500 €", visesa: "52 viv. (Txomin Enea)", desc: "Municipio con mayor tensión de precios de alquiler y compraventa de toda Euskadi.", isCapital: true, isTension: true },
-      "Vitoria": { name: "Vitoria-Gasteiz", terr: "Araba", lat: 42.8467, lng: -2.6716, salary: 1405.0, avgRent: 780, income: "21.000 €", visesa: "162 viv. (Salburua)", desc: "Mayor suelo residencial protegido disponible y cuotas más contenidas para jóvenes.", isCapital: true, isTension: false },
-      "Getxo": { name: "Getxo", terr: "Bizkaia", lat: 43.3556, lng: -3.0119, salary: 1410.0, avgRent: 1150, income: "32.100 €", visesa: "34 viv. (Iturribarren)", desc: "Alta renta disponible y fuerte presión habitacional en la margen derecha.", isCapital: false, isTension: true },
-      "Barakaldo": { name: "Barakaldo", terr: "Bizkaia", lat: 43.2973, lng: -2.9868, salary: 1410.0, avgRent: 840, income: "22.400 €", visesa: "48 viv. (Lutxana)", desc: "Ciudad industrial en transición, alternativa directa al alquiler en Bilbao centro.", isCapital: false, isTension: false },
-      "Portugalete": { name: "Portugalete", terr: "Bizkaia", lat: 43.3206, lng: -3.0195, salary: 1410.0, avgRent: 820, income: "23.000 €", visesa: "25 viv.", desc: "Alta densidad residencial con excelente conectividad de transporte público.", isCapital: false, isTension: false },
-      "Durango": { name: "Durango", terr: "Bizkaia", lat: 43.1685, lng: -2.6315, salary: 1410.0, avgRent: 800, income: "24.500 €", visesa: "30 viv.", desc: "Cabecera de Durangaldea con equilibrio de oferta residencial.", isCapital: false, isTension: false },
-      "Gernika": { name: "Gernika", terr: "Bizkaia", lat: 43.3155, lng: -2.6793, salary: 1410.0, avgRent: 740, income: "23.800 €", visesa: "18 viv.", desc: "Reserva de Urdaibai, parque residencial tradicional y estable.", isCapital: false, isTension: false },
-      "Zarautz": { name: "Zarautz", terr: "Gipuzkoa", lat: 43.2842, lng: -2.1706, salary: 1445.0, avgRent: 1050, income: "27.300 €", visesa: "24 viv. (Irita)", desc: "Fuerte tensión de alquiler vacacional y estacional en costa gipuzkoana.", isCapital: false, isTension: true },
-      "Irun": { name: "Irun", terr: "Gipuzkoa", lat: 43.3390, lng: -1.7894, salary: 1445.0, avgRent: 860, income: "23.100 €", visesa: "42 viv. (Oinaurre)", desc: "Comarca de Txingudi, nodo fronterizo con demanda activa de alquiler protegido.", isCapital: false, isTension: false },
-      "Eibar": { name: "Eibar", terr: "Gipuzkoa", lat: 43.1844, lng: -2.4736, salary: 1445.0, avgRent: 690, income: "22.000 €", visesa: "26 viv.", desc: "Precios de alquiler moderados en la cuenca del Deba.", isCapital: false, isTension: false },
-      "Arrasate": { name: "Arrasate", terr: "Gipuzkoa", lat: 43.0658, lng: -2.4902, salary: 1445.0, avgRent: 720, income: "26.100 €", visesa: "35 viv.", desc: "Fuerte tejido cooperativo industrial y demanda universitaria activa.", isCapital: false, isTension: false },
-      "Tolosa": { name: "Tolosa", terr: "Gipuzkoa", lat: 43.1367, lng: -2.0744, salary: 1445.0, avgRent: 730, income: "24.200 €", visesa: "20 viv.", desc: "Cabecera de Tolosaldea, mercado residencial de media escala.", isCapital: false, isTension: false },
-      "Laudio": { name: "Laudio", terr: "Araba", lat: 43.1436, lng: -3.0809, salary: 1405.0, avgRent: 680, income: "23.400 €", visesa: "20 viv.", desc: "Valle de Ayala, conexión directa de cercanías con Bilbao.", isCapital: false, isTension: false },
-      "Agurain": { name: "Agurain", terr: "Araba", lat: 42.8517, lng: -2.3892, salary: 1405.0, avgRent: 620, income: "20.500 €", visesa: "56 viv. (Harresi)", desc: "Llanada Alavesa, promociones activas de Visesa en régimen de alquiler.", isCapital: false, isTension: false },
-      "Laguardia": { name: "Laguardia", terr: "Araba", lat: 42.5539, lng: -2.5847, salary: 1405.0, avgRent: 580, income: "19.800 €", visesa: "12 viv.", desc: "Rioja Alavesa, menor presión de precios pero reto demográfico juvenil.", isCapital: false, isTension: false }
+      "Bilbao": { 
+        name: "Bilbao", terr: "Bizkaia", lat: 43.2630, lng: -2.9350, salary: 1410.0, avgRent: 950, income: "25.800 €", 
+        visesa: "113 viv. (Zorrotzaurre)", promoTitle: "Zorrotzaurre 113 (boe-a)", promoType: "VPO Alquiler",
+        refCode: "VISESA-9799", zone: "Zorrotzaurre, Bilbao",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9799",
+        image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+        desc: "113 babes ofizialeko etxebizitzak alokairuan Zorrotzaurren. Edificio bioclimático de alta eficiencia energética frente a la ría.",
+        isCapital: true, isTension: true 
+      },
+      "Donostia": { 
+        name: "Donostia", terr: "Gipuzkoa", lat: 43.3183, lng: -1.9812, salary: 1445.0, avgRent: 1250, income: "29.500 €", 
+        visesa: "52 viv. (Txomin Enea)", promoTitle: "Txomin Enea Berria (boe-a)", promoType: "VPO Alquiler",
+        refCode: "VISESA-9812", zone: "Txomin Enea, Donostia",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9812",
+        image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+        desc: "52 viviendas VPO integradas en el ecobarrio de Txomin Enea con calefacción urbana centralizada.",
+        isCapital: true, isTension: true 
+      },
+      "Vitoria": { 
+        name: "Vitoria-Gasteiz", terr: "Araba", lat: 42.8467, lng: -2.6716, salary: 1405.0, avgRent: 780, income: "21.000 €", 
+        visesa: "162 viv. (Salburua)", promoTitle: "Salburua 162 (boe-a)", promoType: "VPO Alquiler",
+        refCode: "VISESA-9800", zone: "Salburua, Vitoria-Gasteiz",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9800",
+        image: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80",
+        desc: "162 viviendas VPO en Salburua bajo estándar Passivhaus junto a los humedales del anillo verde.",
+        isCapital: true, isTension: false 
+      },
+      "Getxo": { 
+        name: "Getxo", terr: "Bizkaia", lat: 43.3556, lng: -3.0119, salary: 1410.0, avgRent: 1150, income: "32.100 €", 
+        visesa: "34 viv. (Iturribarren)", promoTitle: "Residencial Iturribarren", promoType: "VPO Alquiler",
+        refCode: "VISESA-9788", zone: "Algorta / Neguri, Getxo",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9788",
+        image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+        desc: "Viviendas residenciales contemporáneas en la margen derecha con amplias terrazas ajardinadas.",
+        isCapital: false, isTension: true 
+      },
+      "Barakaldo": { 
+        name: "Barakaldo", terr: "Bizkaia", lat: 43.2973, lng: -2.9868, salary: 1410.0, avgRent: 840, income: "22.400 €", 
+        visesa: "48 viv. (Lutxana)", promoTitle: "Torres de Lutxana Urban", promoType: "Alquiler Joven",
+        refCode: "VISESA-9795", zone: "Lutxana, Barakaldo",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9795",
+        image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
+        desc: "Regeneración urbana en Lutxana, 48 viviendas dotacionales reservadas para jóvenes asalariados.",
+        isCapital: false, isTension: false 
+      },
+      "Portugalete": { 
+        name: "Portugalete", terr: "Bizkaia", lat: 43.3206, lng: -3.0195, salary: 1410.0, avgRent: 820, income: "23.000 €", 
+        visesa: "25 viv. (Ría)", promoTitle: "Mirador de la Ría", promoType: "Alquiler Libre",
+        refCode: "HAB-PORTU", zone: "Puente Bizkaia, Portugalete",
+        url: "https://www.habitaclia.com/alquiler-bilbao.htm",
+        image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=800&q=80",
+        desc: "Viviendas reformadas junto a la ría con vistas al Puente Colgante y excelente red de metro.",
+        isCapital: false, isTension: false 
+      },
+      "Durango": { 
+        name: "Durango", terr: "Bizkaia", lat: 43.1685, lng: -2.6315, salary: 1410.0, avgRent: 800, income: "24.500 €", 
+        visesa: "30 viv. (San Fausto)", promoTitle: "San Fausto Berria", promoType: "VPO Alquiler",
+        refCode: "VISESA-9815", zone: "San Fausto, Durango",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9815",
+        image: "https://images.unsplash.com/photo-1515263487990-61b07816b324?auto=format&fit=crop&w=800&q=80",
+        desc: "Cabecera comarcal de Durangaldea, promoción de 30 viviendas públicas con plaza verde interior.",
+        isCapital: false, isTension: false 
+      },
+      "Gernika": { 
+        name: "Gernika", terr: "Bizkaia", lat: 43.3155, lng: -2.6793, salary: 1410.0, avgRent: 740, income: "23.800 €", 
+        visesa: "18 viv. (Urdaibai)", promoTitle: "Urdaibai Parkea", promoType: "Alquiler Sostenible",
+        refCode: "VISESA-9820", zone: "Gernika-Lumo",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9820",
+        image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80",
+        desc: "Edificación de baja densidad integrada en la Reserva de la Biosfera de Urdaibai.",
+        isCapital: false, isTension: false 
+      },
+      "Zarautz": { 
+        name: "Zarautz", terr: "Gipuzkoa", lat: 43.2842, lng: -2.1706, salary: 1445.0, avgRent: 1050, income: "27.300 €", 
+        visesa: "24 viv. (Irita)", promoTitle: "Irita Kostaldea 24 (boe-a)", promoType: "VPO Alquiler",
+        refCode: "VISESA-9825", zone: "Irita, Zarautz",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9825",
+        image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
+        desc: "24 viviendas de alquiler protegido en Zarautz diseñadas para mitigar la presión turística costera.",
+        isCapital: false, isTension: true 
+      },
+      "Irun": { 
+        name: "Irun", terr: "Gipuzkoa", lat: 43.3390, lng: -1.7894, salary: 1445.0, avgRent: 860, income: "23.100 €", 
+        visesa: "42 viv. (Oinaurre)", promoTitle: "Oinaurre Berria 42 (boe-a)", promoType: "VPO Alquiler",
+        refCode: "VISESA-9830", zone: "Oinaurre, Irun",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9830",
+        image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
+        desc: "42 viviendas con garajes y trasteros en el sector de Oinaurre, conexión directa con tren y autobús.",
+        isCapital: false, isTension: false 
+      },
+      "Eibar": { 
+        name: "Eibar", terr: "Gipuzkoa", lat: 43.1844, lng: -2.4736, salary: 1445.0, avgRent: 690, income: "22.000 €", 
+        visesa: "26 viv. (Errebal)", promoTitle: "Errebal Residencial", promoType: "VPO Alquiler",
+        refCode: "VISESA-9835", zone: "Errebal, Eibar",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9835",
+        image: "https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=800&q=80",
+        desc: "Rehabilitación urbana en el valle del Deba con viviendas de alta calificación energética.",
+        isCapital: false, isTension: false 
+      },
+      "Arrasate": { 
+        name: "Arrasate", terr: "Gipuzkoa", lat: 43.0658, lng: -2.4902, salary: 1445.0, avgRent: 720, income: "26.100 €", 
+        visesa: "35 viv. (Musakola)", promoTitle: "Mondragón Habitat Koop", promoType: "Alquiler Joven",
+        refCode: "VISESA-9840", zone: "Musakola, Arrasate",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9840",
+        image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80",
+        desc: "Viviendas eco-eficientes diseñadas para jóvenes investigadores y personal universitario cooperativo.",
+        isCapital: false, isTension: false 
+      },
+      "Tolosa": { 
+        name: "Tolosa", terr: "Gipuzkoa", lat: 43.1367, lng: -2.0744, salary: 1445.0, avgRent: 730, income: "24.200 €", 
+        visesa: "20 viv. (Oria)", promoTitle: "Oria Ibaia Plaza", promoType: "Alquiler Comarcal",
+        refCode: "VISESA-9845", zone: "Centro Histórico, Tolosa",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9845",
+        image: "https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=800&q=80",
+        desc: "Edificio ribereño junto al río Oria con balcones corridos y estructura de madera vista.",
+        isCapital: false, isTension: false 
+      },
+      "Laudio": { 
+        name: "Laudio", terr: "Araba", lat: 43.1436, lng: -3.0809, salary: 1405.0, avgRent: 680, income: "23.400 €", 
+        visesa: "20 viv. (Lamuza)", promoTitle: "Aiaraldea Lamuza", promoType: "VPO Alquiler",
+        refCode: "VISESA-9850", zone: "Lamuza, Laudio / Llodio",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9850",
+        image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80",
+        desc: "20 viviendas públicas en ladera verde con conexión directa a la estación de tren de cercanías.",
+        isCapital: false, isTension: false 
+      },
+      "Agurain": { 
+        name: "Agurain", terr: "Araba", lat: 42.8517, lng: -2.3892, salary: 1405.0, avgRent: 620, income: "20.500 €", 
+        visesa: "56 viv. (Harresi)", promoTitle: "Agurain 58 (boe-a)", promoType: "VPO Alquiler",
+        refCode: "VISESA-9807", zone: "Harresi, Agurain / Salvatierra",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9807",
+        image: "https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=800&q=80",
+        desc: "56 babes ofizialeko etxebizitzak alokairuan Agurainen. Fachada tradicional de piedra y alta inercia térmica.",
+        isCapital: false, isTension: false 
+      },
+      "Laguardia": { 
+        name: "Laguardia", terr: "Araba", lat: 42.5539, lng: -2.5847, salary: 1405.0, avgRent: 580, income: "19.800 €", 
+        visesa: "12 viv. (Harresia)", promoTitle: "Rioja Alavesa Harresia", promoType: "Alquiler Rural Joven",
+        refCode: "VISESA-9855", zone: "Casco Medieval, Laguardia",
+        url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9855",
+        image: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=800&q=80",
+        desc: "Rehabilitación de inmueble histórico intramuros con viviendas para fijación de juventud en comarca vinícola.",
+        isCapital: false, isTension: false 
+      }
     };
 
     // Polígonos provinciales simplificados de Euskadi
@@ -851,12 +1080,12 @@
     };
 
     const listings = [
-      { id: "visesa_9799", muni: "Bilbao", zona: "Zorrotzaurre", titulo: "Zorrotzaurre 113 (boe-a)", tipo: "VPO Alquiler", precio: "Protegido", url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9799" },
-      { id: "visesa_9800", muni: "Vitoria-Gasteiz", zona: "Salburua", titulo: "Salburua 162 (boe-a)", tipo: "VPO Alquiler", precio: "Protegido", url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9800" },
-      { id: "visesa_9807", muni: "Agurain", zona: "Harresi", titulo: "Agurain 58 (boe-a)", tipo: "VPO Alquiler", precio: "Protegido", url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9807" },
-      { id: "pisos_aita_donostia", muni: "Bilbao", zona: "Basurtu", titulo: "Piso exterior en Aita Donostia Plaza", tipo: "Alquiler Libre", precio: "2.300 €", url: "https://www.pisos.com/alquilar/piso-basurtu-65019415385_102200/" },
-      { id: "hab_buenos_aires", muni: "Bilbao", zona: "Abando", titulo: "Ático con ascensor en Buenos Aires", tipo: "Alquiler Libre", precio: "1.400 €", url: "https://www.habitaclia.com/alquiler-bilbao.htm" },
-      { id: "hab_begona", muni: "Bilbao", zona: "Begoña", titulo: "Piso exterior junto a la Basílica", tipo: "Alquiler Libre", precio: "980 €", url: "https://www.habitaclia.com/alquiler-bilbao.htm" }
+      { id: "visesa_9799", muni: "Bilbao", zona: "Zorrotzaurre", titulo: "Zorrotzaurre 113 (boe-a)", tipo: "VPO Alquiler", precio: "Protegido", url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9799", key: "Bilbao" },
+      { id: "visesa_9800", muni: "Vitoria-Gasteiz", zona: "Salburua", titulo: "Salburua 162 (boe-a)", tipo: "VPO Alquiler", precio: "Protegido", url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9800", key: "Vitoria" },
+      { id: "visesa_9807", muni: "Agurain", zona: "Harresi", titulo: "Agurain 58 (boe-a)", tipo: "VPO Alquiler", precio: "Protegido", url: "https://www.visesa.euskadi.eus/webvis01-promocionesdetalle/es/?id=9807", key: "Agurain" },
+      { id: "pisos_aita_donostia", muni: "Bilbao", zona: "Basurtu", titulo: "Piso exterior en Aita Donostia Plaza", tipo: "Alquiler Libre", precio: "2.300 €", url: "https://www.pisos.com/alquilar/piso-basurtu-65019415385_102200/", key: "Bilbao" },
+      { id: "hab_buenos_aires", muni: "Bilbao", zona: "Abando", titulo: "Ático con ascensor en Buenos Aires", tipo: "Alquiler Libre", precio: "1.400 €", url: "https://www.habitaclia.com/alquiler-bilbao.htm", key: "Bilbao" },
+      { id: "hab_begona", muni: "Bilbao", zona: "Begoña", titulo: "Piso exterior junto a la Basílica", tipo: "Alquiler Libre", precio: "980 €", url: "https://www.habitaclia.com/alquiler-bilbao.htm", key: "Bilbao" }
     ];
 
     let currentSelectedMuni = "Bilbao";
@@ -872,7 +1101,7 @@
       const container = document.getElementById("map-container");
       if (!container) return;
 
-      // Crear mapa centrado y encuadrado en las dimensiones de Euskadi
+      // Crear mapa centrado y encuadrado en Euskadi
       leafletMap = L.map("map-container", {
         zoomControl: true,
         attributionControl: false,
@@ -880,7 +1109,7 @@
         maxZoom: 15
       });
 
-      // Teselas CartoDB Positron: Estética monocromática limpia y contrastada
+      // Teselas CartoDB Positron
       L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
         maxZoom: 18,
         subdomains: "abcd"
@@ -915,8 +1144,8 @@
 
       // Encuadre inicial perfecto para todo Euskadi
       leafletMap.fitBounds([
-        [42.48, -3.35], // Suroeste (Laguardia / Enkarterri)
-        [43.48, -1.72]  // Noreste (Hondarribia / Donostia)
+        [42.48, -3.35],
+        [43.48, -1.72]
       ], { padding: [25, 25] });
 
       renderMapMarkers(currentActiveFilter);
@@ -967,6 +1196,20 @@
           icon: icon,
           zIndexOffset: isSelected ? 1000 : (item.isCapital ? 500 : 100)
         });
+
+        // Popup con mini-foto al hacer clic o hover
+        marker.bindPopup(`
+          <div style="width: 200px; font-family: inherit;">
+            <div style="height: 100px; overflow: hidden; background: #eee;">
+              <img src="${item.image}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div style="padding: 10px;">
+              <div style="font-size: 10px; color: #8f8f8f; text-transform: uppercase;">${item.promoType}</div>
+              <div style="font-size: 13px; font-weight: 400; color: #0f1012; margin-top: 2px;">${item.promoTitle}</div>
+              <div style="font-size: 12px; color: #0071e3; margin-top: 4px; font-weight: 500;">Alquiler: ${item.avgRent} €/mes</div>
+            </div>
+          </div>
+        `, { closeButton: false, offset: [0, -10] });
 
         marker.on("click", () => {
           selectMunicipality(key);
@@ -1046,18 +1289,30 @@
       const data = municipalDB[key];
       if (!data) return;
 
-      // Actualizar Ficha Lateral
+      // Actualizar Ficha Lateral y Fotografía de la Vivienda
+      document.getElementById("muni-photo-img").src = data.image;
+      document.getElementById("muni-photo-badge").innerText = data.promoType;
+      document.getElementById("muni-zone-badge").innerText = data.zone;
+      document.getElementById("muni-ref-code").innerText = `Ref: ${data.refCode}`;
+
       document.getElementById("muni-territory-tag").innerText = `TERRITORIO: ${data.terr.toUpperCase()}`;
-      document.getElementById("muni-name-header").innerText = data.name;
+      document.getElementById("muni-name-header").innerText = `${data.name} • ${data.promoTitle}`;
       document.getElementById("muni-desc-text").innerText = data.desc;
       document.getElementById("muni-rent-val").innerText = `${data.avgRent.toLocaleString()} € / mes`;
       document.getElementById("muni-income-val").innerText = data.income;
-      document.getElementById("muni-visesa-val").innerText = data.visesa;
+      document.getElementById("muni-dossier-link").href = data.url;
 
       const rawEffort = (data.avgRent / data.salary) * 100.0;
       const netRent = Math.max(0, data.avgRent - Math.min(300, data.avgRent * 0.5));
       const netEffort = (netRent / data.salary) * 100.0;
       document.getElementById("muni-effort-val").innerText = `${rawEffort.toFixed(1)}% → ${netEffort.toFixed(1)}%`;
+
+      // Actualizar modal lightbox con la misma vivienda
+      document.getElementById("modal-img").src = data.image;
+      document.getElementById("modal-title").innerText = `${data.name} — ${data.promoTitle}`;
+      document.getElementById("modal-tag").innerText = `${data.terr.toUpperCase()} • ${data.promoType}`;
+      document.getElementById("modal-desc").innerText = data.desc;
+      document.getElementById("modal-price").innerText = `${data.avgRent.toLocaleString()} € / mes`;
 
       // Actualizar SVG
       document.querySelectorAll(".muni-node").forEach(n => n.classList.remove("selected"));
@@ -1080,6 +1335,16 @@
       if (leafletMap) {
         leafletMap.panTo([data.lat, data.lng], { animate: true, duration: 0.4 });
       }
+    }
+
+    function openLightbox() {
+      const modal = document.getElementById("lightbox-modal");
+      if (modal) modal.classList.add("active");
+    }
+
+    function closeLightbox() {
+      const modal = document.getElementById("lightbox-modal");
+      if (modal) modal.classList.remove("active");
     }
 
     function applyMuniToSimulator() {
@@ -1195,7 +1460,13 @@
 
       filtered.forEach(p => {
         const tr = document.createElement("tr");
-        tr.className = "hover:bg-[#f2f2f4]/60 transition-colors";
+        tr.className = "hover:bg-[#f2f2f4]/60 transition-colors cursor-pointer";
+        tr.onclick = () => {
+          if (p.key) {
+            selectMunicipality(p.key);
+            window.location.hash = "#cartografia";
+          }
+        };
         tr.innerHTML = `
           <td class="py-3 font-mono text-[11px] text-[#5e5e5e]">${p.id}</td>
           <td class="py-3 text-[#0f1012]">${p.muni} <span class="text-[#8f8f8f]">• ${p.zona}</span></td>
@@ -1203,7 +1474,7 @@
           <td class="py-3 text-[#0f1012]">${p.tipo}</td>
           <td class="py-3 text-right font-light text-[#0f1012]">${p.precio}</td>
           <td class="py-3 text-right">
-            <a href="${p.url}" target="_blank" class="augen-link">Ficha &rarr;</a>
+            <span class="augen-link">Ver &rarr;</span>
           </td>
         `;
         tbody.appendChild(tr);
@@ -1220,6 +1491,11 @@
 
     window.addEventListener("resize", () => {
       if (leafletMap) leafletMap.invalidateSize();
+    });
+
+    // Cerrar modal con Escape
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeLightbox();
     });
   </script>
 </body>
