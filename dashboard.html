@@ -443,10 +443,10 @@
           <!-- Selector de proveedor de teselas para asegurar máxima visibilidad -->
           <div class="flex items-center gap-2">
             <span class="text-[#8f8f8f]">Estilo de mapa:</span>
-            <button onclick="changeTileLayer('voyager')" id="btn-tile-voyager" class="augen-tag !py-0.5 !px-2.5 !text-[11px]">🗺️ Carto Voyager (Recomendado)</button>
+            <button onclick="changeTileLayer('esri')" id="btn-tile-esri" class="augen-tag !py-0.5 !px-2.5 !text-[11px]">🗺️ Mapa Callejero (Esri)</button>
             <button onclick="changeTileLayer('osm')" id="btn-tile-osm" class="augen-tag inactive !py-0.5 !px-2.5 !text-[11px]">📐 OpenStreetMap</button>
+            <button onclick="changeTileLayer('topo')" id="btn-tile-topo" class="augen-tag inactive !py-0.5 !px-2.5 !text-[11px]">⛰️ Relieve Topográfico</button>
             <button onclick="changeTileLayer('satellite')" id="btn-tile-satellite" class="augen-tag inactive !py-0.5 !px-2.5 !text-[11px]">🛰️ Satélite Aéreo</button>
-            <button onclick="changeTileLayer('positron')" id="btn-tile-positron" class="augen-tag inactive !py-0.5 !px-2.5 !text-[11px]">⚪ Quirúrgico</button>
           </div>
 
           <!-- Enfoques Territoriales -->
@@ -1104,25 +1104,25 @@
 
     // Teselas Cartográficas Disponibles
     const tileProviders = {
-      // Carto Voyager: Nítido, mar azul claro, relieve verde, ciudades y carreteras perfectamente visibles
-      voyager: {
-        url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        options: { maxZoom: 18, subdomains: "abcd" }
+      // 1. Esri World Street Map: Libre, sin API Key, mar azul, calles y ciudades nítidas
+      esri: {
+        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        options: { maxZoom: 18, attribution: "&copy; Esri, HERE, Garmin" }
       },
-      // OpenStreetMap: Callejero de alto contraste clásico
+      // 2. OpenStreetMap: Callejero público y gratuito
       osm: {
         url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-        options: { maxZoom: 19 }
+        options: { maxZoom: 19, attribution: "&copy; OpenStreetMap contributors" }
       },
-      // Satélite Esri: Fotografía aérea real
+      // 3. Esri Topo: Relieve y montañas vascas
+      topo: {
+        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+        options: { maxZoom: 18, attribution: "&copy; Esri Topo" }
+      },
+      // 4. Satélite Esri: Ortofoto aérea real de alta resolución
       satellite: {
         url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        options: { maxZoom: 18 }
-      },
-      // Carto Positron: Monocromático
-      positron: {
-        url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-        options: { maxZoom: 18, subdomains: "abcd" }
+        options: { maxZoom: 18, attribution: "&copy; Esri World Imagery" }
       }
     };
 
@@ -1140,7 +1140,7 @@
       });
 
       // Añadir capa inicial: Voyager (mar azul, relieve visible y limpio)
-      changeTileLayer("voyager");
+      changeTileLayer("esri");
 
       // Dibujar polígonos provinciales sutiles
       leafletProvincesLayer = L.layerGroup().addTo(leafletMap);
@@ -1171,9 +1171,9 @@
 
       // Encuadre inicial perfecto para todo Euskadi
       leafletMap.fitBounds([
-        [42.48, -3.35],
-        [43.48, -1.72]
-      ], { padding: [25, 25] });
+        [42.45, -3.30],
+        [43.45, -1.75]
+      ], { padding: [15, 15] });
 
       renderMapMarkers(currentActiveFilter);
 
@@ -1181,10 +1181,7 @@
       setTimeout(() => {
         if (leafletMap) {
           leafletMap.invalidateSize();
-          leafletMap.fitBounds([
-            [42.48, -3.35],
-            [43.48, -1.72]
-          ], { padding: [25, 25] });
+          leafletMap.setView([43.05, -2.60], 9);
         }
       }, 300);
     }
@@ -1194,7 +1191,7 @@
       if (!leafletMap) return;
       if (currentTileLayer) leafletMap.removeLayer(currentTileLayer);
 
-      const prov = tileProviders[key] || tileProviders.voyager;
+      const prov = tileProviders[key] || tileProviders.esri;
       currentTileLayer = L.tileLayer(prov.url, prov.options).addTo(leafletMap);
 
       document.querySelectorAll("[id^='btn-tile-']").forEach(b => b.classList.add("inactive"));
@@ -1292,7 +1289,7 @@
           [43.05, -3.40],
           [43.45, -2.45]
         ], { padding: [20, 20], animate: true, duration: 0.6 });
-        selectMunicipality("Bilbao");
+        selectMunicipality("Bilbao", false);
       } else if (terr === "Gipuzkoa") {
         leafletMap.fitBounds([
           [42.95, -2.50],
@@ -1330,7 +1327,7 @@
       }
     }
 
-    function selectMunicipality(key) {
+    function selectMunicipality(key, panMap = true) {
       currentSelectedMuni = key;
       const data = municipalDB[key];
       if (!data) return;
@@ -1378,7 +1375,7 @@
       if (badgeEl) badgeEl.classList.add("selected");
 
       // Centrar suavemente en el mapa Leaflet
-      if (leafletMap) {
+      if (leafletMap && panMap) {
         leafletMap.panTo([data.lat, data.lng], { animate: true, duration: 0.4 });
       }
     }
@@ -1529,7 +1526,7 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       initLeafletMap();
-      selectMunicipality("Bilbao");
+      selectMunicipality("Bilbao", false);
       runSim();
       runComparison();
       renderTable();
