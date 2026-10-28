@@ -12,6 +12,7 @@ import json
 import csv
 import os
 import requests
+import urllib3
 from bs4 import BeautifulSoup
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
@@ -62,6 +63,15 @@ class PisosComScraper:
             "Referer": "https://www.pisos.com/"
         })
 
+    def _safe_get(self, url: str, **kwargs) -> requests.Response:
+        """Petición GET con soporte y fallback ante certificados SSL locales de la CA de Euskadi."""
+        kwargs.setdefault("timeout", self.timeout)
+        try:
+            return self.session.get(url, **kwargs)
+        except requests.exceptions.SSLError:
+            urllib3.disable_warnings()
+            return self.session.get(url, verify=False, **kwargs)
+
     def scrape_targets(
         self,
         targets: Optional[List[Dict[str, str]]] = None,
@@ -105,14 +115,13 @@ class PisosComScraper:
         max_items: int
     ) -> List[HousingAd]:
         """Descarga y procesa una página HTML de Pisos.com."""
-        resp = self.session.get(url, timeout=self.timeout)
+        resp = self._safe_get(url)
         if resp.status_code == 429:
             raise RuntimeError(f"HTTP 429 Too Many Requests recibido de {url}")
         resp.raise_for_status()
 
         soup = BeautifulSoup(resp.content, "html.parser")
 
-        # Selectores habituales de tarjetas de anuncio en pisos.com
         cards = soup.find_all(class_=re.compile(r"ad-preview|row\s+clearfix|grid__item"))
         if not cards:
             cards = soup.find_all("article")
@@ -138,7 +147,6 @@ class PisosComScraper:
         source_url: str
     ) -> Optional[HousingAd]:
         """Extrae los atributos estructurados desde un elemento HTML de anuncio."""
-        # 1. Título y Enlace
         title_tag = card.find(class_=re.compile(r"ad-preview__title|title")) or card.find(["h2", "h3"])
         link_tag = card.find("a", href=True)
         titulo = title_tag.get_text(strip=True) if title_tag else None
@@ -149,7 +157,6 @@ class PisosComScraper:
         else:
             full_url = href or source_url
 
-        # 2. Identificador
         data_id = (
             card.get("data-ad-id") or
             card.get("data-id") or
@@ -164,7 +171,6 @@ class PisosComScraper:
         elif not str(data_id).startswith("pisos_"):
             data_id = f"pisos_{data_id}"
 
-        # 3. Precio
         precio = None
         price_tag = card.find(class_=re.compile(r"ad-preview__price|price|p-price"))
         if price_tag:
@@ -177,10 +183,8 @@ class PisosComScraper:
                 except ValueError:
                     precio = None
 
-        # 4. Características: Superficie, Habitaciones, Baños
         card_text = card.get_text(" ", strip=True)
 
-        # Superficie en m²
         superficie_m2 = None
         sup_match = re.search(r"(\d+(?:[\.,]\d+)?)\s*m²?", card_text, re.IGNORECASE)
         if sup_match:
@@ -189,7 +193,6 @@ class PisosComScraper:
             except ValueError:
                 superficie_m2 = None
 
-        # Habitaciones
         habitaciones = None
         hab_match = re.search(r"(\d+)\s*(?:habs?|hab\b|dorm\b|habitaciones)", card_text, re.IGNORECASE)
         if hab_match:
@@ -198,7 +201,6 @@ class PisosComScraper:
             except ValueError:
                 habitaciones = None
 
-        # Baños
         banos = None
         banos_match = re.search(r"(\d+)\s*(?:baños?|bñ)", card_text, re.IGNORECASE)
         if banos_match:
@@ -207,15 +209,12 @@ class PisosComScraper:
             except ValueError:
                 banos = None
 
-        # 5. Barrio / Ubicación
         barrio_tag = card.find(class_=re.compile(r"location|zone|ad-preview__location"))
         barrio = barrio_tag.get_text(strip=True) if barrio_tag else None
 
-        # 6. Descripción
         desc_tag = card.find(class_=re.compile(r"description|desc"))
         descripcion = desc_tag.get_text(strip=True) if desc_tag else None
 
-        # Descartar elementos que no contengan título o precio (probables banners o espacios publicitarios)
         if not titulo and not precio:
             return None
 

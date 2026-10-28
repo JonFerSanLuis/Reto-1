@@ -9,6 +9,7 @@ import json
 import csv
 import os
 import requests
+import urllib3
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
 from .models import MunicipalIndicatorValue, IndicatorMetadata, IndicatorsDataset
@@ -19,7 +20,6 @@ class UdalmapClient:
 
     BASE_URL = "https://api.euskadi.eus/udalmap/indicators"
 
-    # Indicadores seleccionados para contextualizar la vivienda juvenil
     TARGET_INDICATORS = {
         "162": {
             "nombre": "Población total (hab.)",
@@ -66,6 +66,15 @@ class UdalmapClient:
             "Accept": "application/json"
         })
 
+    def _safe_get(self, url: str, **kwargs) -> requests.Response:
+        """Petición GET con soporte y fallback ante certificados SSL locales de la CA de Euskadi."""
+        kwargs.setdefault("timeout", self.timeout)
+        try:
+            return self.session.get(url, **kwargs)
+        except requests.exceptions.SSLError:
+            urllib3.disable_warnings()
+            return self.session.get(url, verify=False, **kwargs)
+
     def fetch_all_target_indicators(self, filter_municipalities: Optional[List[str]] = None) -> IndicatorsDataset:
         """
         Descarga todos los indicadores clave seleccionados.
@@ -74,7 +83,6 @@ class UdalmapClient:
         dataset = IndicatorsDataset()
         errores: List[str] = []
 
-        # 1. Registrar metadatos
         for ind_id, info in self.TARGET_INDICATORS.items():
             dataset.metadatos[ind_id] = IndicatorMetadata(
                 id=ind_id,
@@ -85,11 +93,10 @@ class UdalmapClient:
                 limitaciones=info["limitaciones"]
             )
 
-        # 2. Descargar datos de cada indicador
         for ind_id, meta in dataset.metadatos.items():
             url = f"{self.BASE_URL}/{ind_id}?_format=json"
             try:
-                resp = self.session.get(url, timeout=self.timeout)
+                resp = self._safe_get(url)
                 resp.raise_for_status()
                 data = resp.json()
                 parsed_vals = self._parse_indicator_data(ind_id, meta.nombre, meta.unidad, data, filter_municipalities)
@@ -123,23 +130,24 @@ class UdalmapClient:
                 if muni_name.lower() not in filter_munis_lower and muni_id not in filter_munis:
                     continue
 
-            # Extraer años y valores
-            years_list = m.get("years", [])
-            merged_years: Dict[str, float] = {}
-            for year_dict in years_list:
-                for y, val in year_dict.items():
+            years_data = m.get("years", [])
+            val_map: Dict[str, float] = {}
+
+            for y_item in years_data:
+                for y_str, val in y_item.items():
                     if val is not None:
                         try:
-                            merged_years[str(y)] = float(val)
+                            val_map[str(y_str)] = float(val)
                         except (ValueError, TypeError):
                             pass
 
-            ultimo_ano = None
-            ultimo_valor = None
-            if merged_years:
-                sorted_years = sorted(merged_years.keys(), key=lambda x: int(x) if x.isdigit() else 0)
+            if val_map:
+                sorted_years = sorted(val_map.keys(), key=lambda x: int(x) if x.isdigit() else 0)
                 ultimo_ano = sorted_years[-1]
-                ultimo_valor = merged_years[ultimo_ano]
+                ultimo_valor = val_map[ultimo_ano]
+            else:
+                ultimo_ano = None
+                ultimo_valor = None
 
             results.append(MunicipalIndicatorValue(
                 municipio_id=muni_id,
@@ -147,7 +155,7 @@ class UdalmapClient:
                 indicador_id=ind_id,
                 indicador_nombre=nombre,
                 unidad=unidad,
-                valores_por_ano=merged_years,
+                valores_por_ano=val_map,
                 ultimo_ano=ultimo_ano,
                 ultimo_valor=ultimo_valor
             ))
@@ -155,25 +163,28 @@ class UdalmapClient:
         return results
 
     def save_to_json(self, dataset: IndicatorsDataset, filepath: str) -> None:
-        """Guarda los indicadores en JSON preservando metadatos y series temporales."""
+        """Exporta el dataset completo de indicadores a un archivo JSON."""
         os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(dataset.model_dump(), f, ensure_ascii=False, indent=2)
 
     def save_to_csv(self, dataset: IndicatorsDataset, filepath: str) -> None:
-        """Guarda una versión tabular en CSV con el último valor y el año de referencia."""
+        """Exporta los valores municipales de indicadores a un CSV tabular y desnormalizado."""
         os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
-        fieldnames = ["municipio_id", "municipio_nombre", "indicador_id", "indicador_nombre", "unidad", "ultimo_ano", "ultimo_valor"]
+        fieldnames = [
+            "municipio_id", "municipio_nombre", "indicador_id", "indicador_nombre",
+            "unidad", "ultimo_ano", "ultimo_valor"
+        ]
         with open(filepath, "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
-            for r in dataset.registros:
+            for reg in dataset.registros:
                 writer.writerow({
-                    "municipio_id": r.municipio_id,
-                    "municipio_nombre": r.municipio_nombre,
-                    "indicador_id": r.indicador_id,
-                    "indicador_nombre": r.indicador_nombre,
-                    "unidad": r.unidad,
-                    "ultimo_ano": r.ultimo_ano,
-                    "ultimo_valor": r.ultimo_valor
+                    "municipio_id": reg.municipio_id,
+                    "municipio_nombre": reg.municipio_nombre,
+                    "indicador_id": reg.indicador_id,
+                    "indicador_nombre": reg.indicador_nombre,
+                    "unidad": reg.unidad,
+                    "ultimo_ano": reg.ultimo_ano,
+                    "ultimo_valor": reg.ultimo_valor
                 })

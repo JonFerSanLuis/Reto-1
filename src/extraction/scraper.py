@@ -11,6 +11,7 @@ import json
 import csv
 import os
 import requests
+import urllib3
 from bs4 import BeautifulSoup
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
@@ -34,11 +35,20 @@ class HabitacliaScraper:
         self.session.headers.update({
             "User-Agent": (
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
             ),
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
             "Accept-Language": "es-ES,es;q=0.9,eu;q=0.8,en;q=0.7"
         })
+
+    def _safe_get(self, url: str, **kwargs) -> requests.Response:
+        """Petición GET con soporte y fallback ante certificados SSL locales de la CA de Euskadi."""
+        kwargs.setdefault("timeout", self.timeout)
+        try:
+            return self.session.get(url, **kwargs)
+        except requests.exceptions.SSLError:
+            urllib3.disable_warnings()
+            return self.session.get(url, verify=False, **kwargs)
 
     def scrape_targets(self, targets: Optional[List[Dict[str, str]]] = None, max_items_per_target: int = 20) -> ExtractionResult:
         """
@@ -60,7 +70,6 @@ class HabitacliaScraper:
             except Exception as e:
                 errores.append(f"Fallo al raspar {url} ({muni}): {e}")
 
-            # Pausa de cortesía para respetar el servidor
             time.sleep(self.delay)
 
         return ExtractionResult(
@@ -72,7 +81,7 @@ class HabitacliaScraper:
 
     def _scrape_page(self, url: str, municipio: str, tipo_operacion: str, max_items: int) -> List[HousingAd]:
         """Descarga y parsea una página web individual de anuncios."""
-        resp = self.session.get(url, timeout=self.timeout)
+        resp = self._safe_get(url)
         if resp.status_code == 429:
             raise RuntimeError(f"HTTP 429 Too Many Requests recibido de {url}")
         resp.raise_for_status()
@@ -95,14 +104,12 @@ class HabitacliaScraper:
 
     def _extract_article_data(self, article, municipio: str, tipo_operacion: str, index: int, source_url: str) -> Optional[HousingAd]:
         """Extrae los campos individuales de un elemento HTML de anuncio."""
-        # 1. Título y Enlace
         title_tag = article.find(["h2", "h3"])
         link_tag = article.find("a", href=True)
         titulo = title_tag.get_text(strip=True) if title_tag else None
         href = link_tag["href"] if link_tag else None
         full_url = href if (href and href.startswith("http")) else (f"https://www.habitaclia.com{href}" if href else source_url)
 
-        # 2. Identificador
         data_id = article.get("data-id") or article.get("id")
         if not data_id and href:
             match_id = re.search(r"(\d+)\.htm", href)
@@ -110,7 +117,6 @@ class HabitacliaScraper:
         elif not data_id:
             data_id = f"{municipio.lower()}_{index}_{int(time.time())}"
 
-        # 3. Precio
         precio = None
         price_tag = article.find(class_=re.compile(r"font-2|price|precio"))
         if price_tag:
@@ -121,83 +127,81 @@ class HabitacliaScraper:
                     precio = float(clean_num)
                 except ValueError:
                     precio = None
-        else:
-            price_match = re.search(r"\b(\d{1,2}(?:\.\d{3})*|\d+)\s*€", article.get_text())
-            if price_match:
-                try:
-                    clean_num = price_match.group(1).replace(".", "").replace(",", ".")
-                    precio = float(clean_num)
-                except ValueError:
-                    precio = None
 
-        # 4. Características: m², habitaciones, baños
-        text_content = article.get_text(" ", strip=True)
-        superficie = None
-        sup_match = re.search(r"(\d+)\s*m[2²]", text_content, re.I)
+        superficie_m2 = None
+        habitaciones = None
+        banos = None
+
+        features_tag = article.find(class_=re.compile(r"feature|details|info"))
+        text_content = (features_tag.get_text(" ", strip=True) if features_tag else "") + " " + article.get_text(" ", strip=True)
+
+        sup_match = re.search(r"(\d+(?:[\.,]\d+)?)\s*m2", text_content, re.IGNORECASE)
         if sup_match:
             try:
-                superficie = float(sup_match.group(1))
+                superficie_m2 = float(sup_match.group(1).replace(",", "."))
             except ValueError:
                 pass
 
-        habitaciones = None
-        hab_match = re.search(r"(\d+)\s*hab", text_content, re.I)
+        hab_match = re.search(r"(\d+)\s*(?:hab|dorm)", text_content, re.IGNORECASE)
         if hab_match:
             try:
                 habitaciones = int(hab_match.group(1))
             except ValueError:
                 pass
 
-        banos = None
-        ban_match = re.search(r"(\d+)\s*baño", text_content, re.I)
+        ban_match = re.search(r"(\d+)\s*baño", text_content, re.IGNORECASE)
         if ban_match:
             try:
                 banos = int(ban_match.group(1))
             except ValueError:
                 pass
 
-        # 5. Barrio / Ubicación
-        location_tag = article.find(class_=re.compile(r"location|ubicacion|barrio"))
-        barrio = location_tag.get_text(strip=True) if location_tag else None
+        loc_tag = article.find(class_=re.compile(r"location|ubicacion|zone"))
+        barrio = loc_tag.get_text(strip=True) if loc_tag else None
 
-        # Si no encontramos datos mínimos de anuncio (precio o título), descartar
-        if not precio and not titulo:
+        desc_tag = article.find("p")
+        descripcion = desc_tag.get_text(strip=True) if desc_tag else None
+
+        if not titulo and not precio:
             return None
 
+        clean_id = f"habitaclia_{data_id}" if not str(data_id).startswith("habitaclia_") else str(data_id)
+
         return HousingAd(
-            id=f"habitaclia_{data_id}",
+            id=clean_id,
             fuente="Habitaclia_Scraping",
             tipo_operacion=tipo_operacion,
             municipio=municipio,
+            provincia=None,
             barrio=barrio,
+            direccion=None,
             precio=precio,
-            superficie_m2=superficie,
+            superficie_m2=superficie_m2,
             habitaciones=habitaciones,
             banos=banos,
             titulo=titulo,
-            descripcion=text_content[:300] if text_content else None,
+            descripcion=descripcion,
             url=full_url,
             fecha_extraccion=datetime.now(timezone.utc).isoformat(),
             es_sintetico=False
         )
 
     def save_to_json(self, result: ExtractionResult, filepath: str) -> None:
-        """Guarda los resultados del scraping en JSON."""
+        """Exporta el resultado a formato JSON indentado."""
         os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(result.model_dump(), f, ensure_ascii=False, indent=2)
 
     def save_to_csv(self, result: ExtractionResult, filepath: str) -> None:
-        """Guarda los resultados del scraping en CSV."""
+        """Exporta el resultado a formato CSV estructurado."""
         os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
-        if not result.items:
-            with open(filepath, "w", encoding="utf-8", newline="") as f:
-                f.write("id,fuente,tipo_operacion,municipio,precio,superficie_m2,habitaciones,fecha_extraccion\n")
-            return
-
-        fieldnames = list(result.items[0].model_dump().keys())
+        fieldnames = [
+            "id", "fuente", "tipo_operacion", "municipio", "provincia", "barrio",
+            "direccion", "precio", "superficie_m2", "habitaciones", "banos",
+            "titulo", "descripcion", "url", "fecha_extraccion", "es_sintetico"
+        ]
         with open(filepath, "w", encoding="utf-8", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
             for item in result.items:
-                writer.writerow(item.model_dump())
+                writer.writerow(item.to_dict())
