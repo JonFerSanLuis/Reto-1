@@ -1,0 +1,40 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "▶️ Reto 1: Pipeline Completo + Dashboard Visual",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "🌐 Abrir Solo Dashboard Visual (Port 8080)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--visual"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "⚡ Ejecutar Solo Pipeline de Datos y Análisis",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--pipeline"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "🧪 Ejecutar Suite de Pruebas (pytest)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-v", "tests/"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}

@@ -412,6 +412,110 @@
       </div>
     </section>
 
+    <!-- SECCIÓN: DIAGNÓSTICO OFICIAL • RESPUESTA AL RETO -->
+    <section id="diagnostico" class="space-y-6">
+      <div class="space-y-1">
+        <div class="augen-caption">INFORME PARA LA ENTIDAD PÚBLICA • RESPUESTA AL RETO</div>
+        <h2 class="augen-heading">¿Puede una persona joven independizarse en Euskadi con su salario?</h2>
+        <p class="augen-body text-[#5e5e5e] max-w-3xl pt-1">
+          Cruce científico entre los salarios netos de la juventud asalariada (18-29 años, Observatorio Vasco de la Juventud: Bizkaia 1.410 €, Gipuzkoa 1.445 €, Araba 1.405 €) y los precios reales de alquiler libre y protegido (Open Data Euskadi / Habitaclia).
+        </p>
+      </div>
+
+      <!-- Card Central de Conclusiones (54px Radius) -->
+      <div class="augen-card space-y-8">
+        
+        <!-- Veredicto Principal -->
+        <div class="p-6 rounded-[26px] bg-[#f2f2f4] border border-black/[0.06] flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-[#0071e3]">DICTAMEN OFICIAL</div>
+            <div class="text-[18px] text-[#0f1012] font-light leading-snug">
+              En solitario en mercado libre de capitales: <span class="text-[#0f1012] font-normal">NO es viable</span> (esfuerzo 55% - 86%).<br>
+              Con <span class="text-[#0071e3] font-normal">Gaztelagun</span> o <span class="text-[#0071e3] font-normal">VPO</span>: <span class="text-[#0f1012] font-normal">SÍ es viable y financieramente sostenible</span> (18% - 34%).
+            </div>
+          </div>
+          <div class="shrink-0 flex items-center gap-2">
+            <span class="augen-tag !bg-white !text-[13px] !py-1.5 !px-4">📊 16 Municipios Auditados</span>
+          </div>
+        </div>
+
+        <!-- 4 Modalidades de Emancipación -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- 1. En Solitario Libre -->
+          <div class="p-5 rounded-[26px] bg-[#fdfdfd] border border-black/[0.08] space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] uppercase tracking-wider text-[#8f8f8f]">Mercado Libre (Solo)</span>
+              <span class="text-[12px] text-red-600 font-light">Inviable</span>
+            </div>
+            <div class="text-[24px] text-[#0f1012] font-light">56% - 86%</div>
+            <div class="text-[11px] text-[#5e5e5e] leading-relaxed">
+              Supera drásticamente el umbral del 35% del Banco de España. Donostia (86.5%) y Bilbao (67.4%) en exclusión.
+            </div>
+          </div>
+
+          <!-- 2. Con Gaztelagun -->
+          <div class="p-5 rounded-[26px] bg-[#fdfdfd] border border-black/[0.08] space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] uppercase tracking-wider text-[#0071e3]">Con Gaztelagun (-300 €)</span>
+              <span class="text-[12px] text-[#0071e3] font-light">Viable (11 mun.)</span>
+            </div>
+            <div class="text-[24px] text-[#0071e3] font-light">18% - 34%</div>
+            <div class="text-[11px] text-[#5e5e5e] leading-relaxed">
+              Baja entre 18 y 22 puntos el esfuerzo. Vitoria (34.2%), Barakaldo (34.8%) y Durango (29.1%) entran en zona asumible.
+            </div>
+          </div>
+
+          <!-- 3. Compartiendo Piso -->
+          <div class="p-5 rounded-[26px] bg-[#fdfdfd] border border-black/[0.08] space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] uppercase tracking-wider text-[#8f8f8f]">Piso Compartido (2)</span>
+              <span class="text-[12px] text-green-700 font-light">Muy Viable</span>
+            </div>
+            <div class="text-[24px] text-[#0f1012] font-light">25% - 34%</div>
+            <div class="text-[11px] text-[#5e5e5e] leading-relaxed">
+              Al repartir gastos entre dos convivientes, el esfuerzo se sitúa en torno a 330 € - 475 € por persona en Bilbao y Vitoria.
+            </div>
+          </div>
+
+          <!-- 4. VPO / Alokabide -->
+          <div class="p-5 rounded-[26px] bg-[#fdfdfd] border border-black/[0.08] space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] uppercase tracking-wider text-[#0071e3]">VPO / Alokabide</span>
+              <span class="text-[12px] text-[#0071e3] font-light">Escudo Social</span>
+            </div>
+            <div class="text-[24px] text-[#0f1012] font-light">24% - 32%</div>
+            <div class="text-[11px] text-[#5e5e5e] leading-relaxed">
+              Rentas tasadas de 340 € a 460 €/mes en promociones Visesa. Permite la emancipación individual con total solvencia.
+            </div>
+          </div>
+        </div>
+
+        <!-- ¿Dónde pueden vivir los jóvenes? - Guía Territorial Rápida -->
+        <div class="space-y-3 pt-2">
+          <div class="text-[12px] uppercase tracking-wider text-[#8f8f8f]">¿Dónde pueden vivir los jóvenes en Euskadi? • Selección Rápida en el Mapa</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <button onclick="setMapFilter('viable'); document.getElementById('cartografia').scrollIntoView({behavior: 'smooth'});" class="p-3 text-left rounded-[16px] bg-[#f2f2f4] hover:bg-black/[0.04] transition border border-black/[0.06] space-y-1">
+              <div class="text-[12px] text-[#0071e3]">🟢 Comarcas Asequibles</div>
+              <div class="text-[11px] text-[#5e5e5e]">Agurain, Balmaseda, Eibar, Mondragón (<35% sin o con leve ayuda)</div>
+            </button>
+            <button onclick="setMapFilter('gaztelagun'); document.getElementById('cartografia').scrollIntoView({behavior: 'smooth'});" class="p-3 text-left rounded-[16px] bg-[#f2f2f4] hover:bg-black/[0.04] transition border border-black/[0.06] space-y-1">
+              <div class="text-[12px] text-[#0071e3]">🟡 Metropolitano + Gaztelagun</div>
+              <div class="text-[11px] text-[#5e5e5e]">Vitoria-Gasteiz, Barakaldo, Basauri, Durango, Santurtzi</div>
+            </button>
+            <button onclick="setMapFilter('tension'); document.getElementById('cartografia').scrollIntoView({behavior: 'smooth'});" class="p-3 text-left rounded-[16px] bg-[#f2f2f4] hover:bg-black/[0.04] transition border border-black/[0.06] space-y-1">
+              <div class="text-[12px] text-[#0071e3]">🔴 Tensión Severa</div>
+              <div class="text-[11px] text-[#5e5e5e]">Bilbao, Zarautz, Irún (Requiere compartir o ayuda urgente)</div>
+            </button>
+            <button onclick="setMapFilter('visesa'); document.getElementById('cartografia').scrollIntoView({behavior: 'smooth'});" class="p-3 text-left rounded-[16px] bg-[#f2f2f4] hover:bg-black/[0.04] transition border border-black/[0.06] space-y-1">
+              <div class="text-[12px] text-[#0071e3]">🏢 VPO Visesa Activas</div>
+              <div class="text-[11px] text-[#5e5e5e]">Txomin Enea, Zorrotzaurre, Salburua, Iturribarren</div>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
     <!-- SECCIÓN 1: CARTOGRAFÍA GEOESPACIAL INTERACTIVA CON FOTOGRAFÍA -->
     <section id="cartografia" class="space-y-6">
       <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4">
@@ -424,8 +528,10 @@
         <div class="flex flex-wrap items-center gap-2" id="view-switcher">
           <span class="text-[11px] text-[#8f8f8f] mr-1">Filtro:</span>
           <button onclick="setMapFilter('all')" class="augen-tag" id="btn-flt-all">Todos (16)</button>
-          <button onclick="setMapFilter('visesa')" class="augen-tag inactive" id="btn-flt-visesa">VPO Visesa</button>
-          <button onclick="setMapFilter('tension')" class="augen-tag inactive" id="btn-flt-tension">Tensionados (&gt;40%)</button>
+          <button onclick="setMapFilter('viable')" class="augen-tag inactive" id="btn-flt-viable">🟢 Viables (&le;35%)</button>
+          <button onclick="setMapFilter('gaztelagun')" class="augen-tag inactive" id="btn-flt-gaztelagun">🟡 Viables + Gaztelagun</button>
+          <button onclick="setMapFilter('tension')" class="augen-tag inactive" id="btn-flt-tension">🔴 Tensionados (&gt;40%)</button>
+          <button onclick="setMapFilter('visesa')" class="augen-tag inactive" id="btn-flt-visesa">🏢 VPO Visesa</button>
           
           <div class="border-l border-black/[0.08] pl-2 ml-1 flex gap-1">
             <button onclick="toggleMapMode('leaflet')" id="btn-mode-leaflet" class="augen-tag !text-[10px]">Mapa Leaflet</button>
@@ -1209,9 +1315,15 @@
       Object.keys(municipalDB).forEach(key => {
         const item = municipalDB[key];
 
+        // Cálculo de esfuerzo para filtros
+        const effortSin = (item.avgRent / item.salary) * 100;
+        const effortCon = (Math.max(0, item.avgRent - 300) / item.salary) * 100;
+
         // Aplicar filtros funcionales
         if (filter === "visesa" && !item.visesa.includes("viv.")) return;
-        if (filter === "tension" && !item.isTension) return;
+        if (filter === "tension" && effortSin <= 40) return;
+        if (filter === "viable" && effortCon > 35) return;
+        if (filter === "gaztelagun" && (effortSin <= 35 || effortCon > 35)) return;
 
         count++;
         const isSelected = (key === currentSelectedMuni);

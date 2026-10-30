@@ -74,7 +74,14 @@ flowchart TD
 │   ├── raw/                        # Datos brutos generados localmente (.gitignored)
 │   ├── samples/                    # Muestras representativas no sensibles (JSON)
 │   └── hdfs_storage/               # Almacenamiento local para modo emulación HDFS
+├── main.py                         # Orquestador general ejecutable desde VS Code y terminal
+├── .vscode/                        # Perfiles de ejecución y depuración F5 para VS Code
+│   ├── launch.json
+│   ├── tasks.json
+│   └── settings.json
 ├── src/
+│   ├── analysis/                   # Motor de análisis y diagnóstico para la entidad pública
+│   │   └── housing_study.py        # Síntesis, ranking de 16 municipios y cálculo de viabilidad
 │   ├── extraction/                 # Objetivo 1: Extracción de vivienda
 │   │   ├── models.py               # Modelos Pydantic (HousingAd, ExtractionResult)
 │   │   ├── api_client.py           # Cliente API Open Data Euskadi / Visesa
@@ -173,13 +180,68 @@ flowchart TD
 
 ---
 
-## Ejecución del Pipeline Integral
+## Ejecución del Proyecto (Desde Visual Studio Code o Terminal)
 
-Para ejecutar de principio a fin la extracción real, descarga de indicadores, cálculo de esfuerzo juvenil, guardado en HDFS y streaming con Kafka:
+El proyecto cuenta con un orquestador unificado (`main.py`) y perfiles de ejecución configurados en `.vscode/` para interactuar de forma inmediata tanto por consola como mediante el panel visual:
 
+### 1. Ejecución Directa en Visual Studio Code (F5)
+Al abrir el repositorio en VS Code:
+1. Abre el panel **Run & Debug** (`Ctrl+Shift+D` o `Cmd+Shift+D`).
+2. Selecciona cualquiera de los perfiles disponibles y pulsa **Play / F5**:
+   - `▶️ Reto 1: Pipeline Completo + Dashboard Visual`: Ejecuta los 4 objetivos, imprime el diagnóstico analítico en el terminal integrado de VS Code y abre automáticamente el navegador web con el Dashboard Visual Augen Pro.
+   - `🌐 Abrir Solo Dashboard Visual (Port 8080)`: Inicia el servidor web local y abre la interfaz interactiva.
+   - `⚡ Ejecutar Solo Pipeline de Datos y Análisis`: Ejecuta la ingesta, HDFS, Kafka y el análisis sin levantar el navegador.
+   - `🧪 Ejecutar Suite de Pruebas (pytest)`: Pasa los 18 tests automatizados.
+
+### 2. Ejecución desde Terminal
 ```bash
-python scripts/run_pipeline.py
+# Ejecutar pipeline completo + abrir dashboard visual interactivo:
+python main.py
+
+# Ejecutar únicamente el pipeline de datos e imprimir el estudio en consola:
+python main.py --pipeline
+
+# Iniciar únicamente el servidor web del dashboard visual:
+python main.py --visual
+
+# Ejecutar las pruebas automatizadas (pytest):
+python main.py --test
+# o bien:
+pytest tests/ -v
 ```
+
+---
+
+## Diagnóstico y Respuesta a la Entidad Pública
+
+### Pregunta 1: ¿Puede una persona joven independizarse en Euskadi con su salario?
+**Dictamen Fundamentado**:
+- **En solitario en mercado libre (capitales y costa)**: **NO ES VIABLE** sin ayudas públicas. En Donostia (esfuerzo del 86.5%), Getxo (81.6%) y Bilbao (67.4%), el pago del alquiler medio absorbe entre dos tercios y la totalidad del salario neto medio de una persona joven (1.410 € - 1.445 €/mes), vulnerando de forma crítica el límite de endeudamiento prudencial del 30-35% recomendado por el Banco de España y Eurostat.
+- **Con el programa Gaztelagun (-300 €/mes)**: La emancipación individual **SÍ ES VIABLE** en municipios medianos y comarcales, así como en Vitoria-Gasteiz, donde la tasa de esfuerzo desciende al **34.2%** (dentro del umbral asumible). En Bilbao y Barakaldo reduce la tensión a niveles manejables (34.8% en Barakaldo).
+- **Compartiendo piso (2 personas)**: **AMPLIAMENTE VIABLE** en la práctica totalidad de Euskadi (esfuerzo de 24% a 34%), requiriendo entre 330 € y 475 € al mes por persona.
+- **En Vivienda de Protección Oficial (VPO / Alokabide)**: **PLENAMENTE SOSTENIBLE** (esfuerzo del 24% al 32%), gracias a rentas tasadas de 340 € a 460 €/mes.
+
+### Pregunta 2: ¿Dónde pueden vivir los jóvenes en Euskadi?
+A partir del análisis de los 16 municipios representativos, se establece la siguiente zonificación territorial:
+
+| Ranking | Municipio | Territorio | Alquiler Medio | Esfuerzo Sin Ayuda | Esfuerzo Con Gaztelagun | Diagnóstico de Viabilidad |
+|:---:|:---|:---|:---:|:---:|:---:|:---|
+| 1 | **Agurain / Salvatierra** | Araba | 520 € | 37.0% | **18.5%** | 🟢 Viable en solitario / Gaztelagun |
+| 2 | **Balmaseda** | Bizkaia | 550 € | 39.0% | **19.5%** | 🟢 Viable en solitario / Gaztelagun |
+| 3 | **Eibar** | Gipuzkoa | 620 € | 42.9% | **22.1%** | 🟢 Viable con Gaztelagun |
+| 4 | **Arrasate / Mondragón** | Gipuzkoa | 660 € | 45.7% | **24.9%** | 🟢 Viable con Gaztelagun |
+| 5 | **Durango** | Bizkaia | 710 € | 50.4% | **29.1%** | 🟡 Viable con Gaztelagun |
+| 6 | **Basauri** | Bizkaia | 720 € | 51.1% | **29.8%** | 🟡 Viable con Gaztelagun |
+| 7 | **Errenteria** | Gipuzkoa | 750 € | 51.9% | **31.1%** | 🟡 Viable con Gaztelagun |
+| 8 | **Santurtzi** | Bizkaia | 740 € | 52.5% | **31.2%** | 🟡 Viable con Gaztelagun |
+| 9 | **Portugalete** | Bizkaia | 760 € | 53.9% | **32.6%** | 🟡 Viable con Gaztelagun |
+| 10 | **Vitoria-Gasteiz** | Araba | 780 € | 55.5% | **34.2%** | 🟡 Viable con Gaztelagun |
+| 11 | **Barakaldo** | Bizkaia | 790 € | 56.0% | **34.8%** | 🟡 Viable con Gaztelagun |
+| 12 | **Irún** | Gipuzkoa | 810 € | 56.1% | 35.3% | 🔴 Solo compartiendo piso |
+| 13 | **Bilbao** | Bizkaia | 950 € | 67.4% | 46.1% | 🔴 Solo compartiendo / VPO |
+| 14 | **Zarautz** | Gipuzkoa | 990 € | 68.5% | 47.8% | 🔴 Solo compartiendo / VPO |
+| 15 | **Getxo** | Bizkaia | 1.150 € | 81.6% | 60.3% | ⛔ Exclusión / Requiere VPO |
+| 16 | **Donostia / San Sebastián** | Gipuzkoa | 1.250 € | 86.5% | 65.7% | ⛔ Exclusión / Requiere VPO |
 
 El script genera los siguientes ficheros en `data/raw/` y sube los originales a HDFS:
 - `data/raw/vivienda_api_YYYYMMDD.json` / `.csv`
@@ -224,8 +286,9 @@ tests/test_extraction.py ................. PASSED (5 tests)
 tests/test_indicators.py ................. PASSED (6 tests)
 tests/test_hdfs.py ....................... PASSED (2 tests)
 tests/test_kafka.py ...................... PASSED (2 tests)
+tests/test_analysis.py .................... PASSED (2 tests)
 tests/test_integration.py ................ PASSED (1 test)
-16 passed in < 1s
+18 passed in < 0.5s
 ```
 
 ---

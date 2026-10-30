@@ -1,0 +1,52 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Reto 1: Ejecutar Pipeline y Dashboard Visual",
+      "type": "shell",
+      "command": "${command:python.interpreterPath}",
+      "args": ["${workspaceFolder}/main.py"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Reto 1: Ejecutar Tests (pytest)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath}",
+      "args": ["-m", "pytest", "tests/"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Reto 1: Iniciar Servidor Web Visual",
+      "type": "shell",
+      "command": "${command:python.interpreterPath}",
+      "args": ["${workspaceFolder}/main.py", "--visual"],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
