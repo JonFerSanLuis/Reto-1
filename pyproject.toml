@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "reto1-vivienda-euskadi"
+name = "curso-ia-bigdata"
 version = "0.1.0"
-description = "Estudio de posibilidades de acceso a la vivienda para jóvenes en Euskadi - Fase 1 Big Data"
+description = "Repositorio Académico Multidisciplinar - IA y Big Data (Ainhoa, MIA, PIA, SAA)"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -22,5 +22,5 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["."]
+testpaths = ["ainhoa/tests", "tests"]
+pythonpath = [".", "ainhoa"]

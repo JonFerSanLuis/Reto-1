@@ -116,7 +116,7 @@ def run_tests() -> bool:
     print(">>> Ejecutando pruebas automatizadas (pytest)...")
     python_exec = sys.executable
     try:
-        res = subprocess.run([python_exec, "-m", "pytest", "tests", "-v"], check=False)
+        res = subprocess.run([python_exec, "-m", "pytest", "-v"], check=False)
         return res.returncode == 0
     except Exception as e:
         print(f"[ERROR] No se pudo ejecutar pytest: {e}", file=sys.stderr)
@@ -134,7 +134,8 @@ def get_status() -> Tuple[List[str], List[str]]:
             continue
         idx_status = line[0]
         work_status = line[1]
-        path = line[3:].strip()
+        raw_path = line[3:].strip()
+        path = raw_path.split(" -> ")[-1].strip() if " -> " in raw_path else raw_path
         if idx_status not in (" ", "?"):
             staged.append(path)
         if work_status not in (" ",):

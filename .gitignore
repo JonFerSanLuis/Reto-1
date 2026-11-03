@@ -55,6 +55,12 @@ data/processed/*
 !data/processed/.gitkeep
 data/hdfs_storage/*
 !data/hdfs_storage/.gitkeep
+ainhoa/data/raw/*
+!ainhoa/data/raw/.gitkeep
+ainhoa/data/processed/*
+!ainhoa/data/processed/.gitkeep
+ainhoa/data/hdfs_storage/*
+!ainhoa/data/hdfs_storage/.gitkeep
 
 # Local developer configuration
 config.local.json
